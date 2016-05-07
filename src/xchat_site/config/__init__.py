@@ -1,0 +1,15 @@
+# coding=utf-8
+import os
+from utils.pmc_config import register_config, get_project_root
+
+PROJECT_ROOT = get_project_root(target='src')
+
+
+def load_config(env):
+    register_config(__name__, 'settings', env=env)
+
+    register_config(__name__, 'etc', env=env)
+
+
+load_config(os.getenv('ENV', 'default'))
+

@@ -1,0 +1,5 @@
+.idea/
+venv/
+*.py[cod]
+*.sqlite*
+__pycache__/
