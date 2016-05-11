@@ -1,17 +1,13 @@
-
 if __name__ == '__main__':
     import asyncio
-    from autobahn.asyncio.websocket import WebSocketServerFactory
-    from ws.server import XChatServerProtocol
+    from ws.server import XChatServerFactory
 
-    factory = WebSocketServerFactory()
-    factory.protocol = XChatServerProtocol
+    factory = XChatServerFactory()
 
     loop = asyncio.get_event_loop()
-    coro = loop.create_server(factory, 'localhost', 4880)
+    coro = loop.create_server(factory, port=4880)
     server = loop.run_until_complete(coro)
 
-    asyncio.coroutine()
     try:
         loop.run_forever()
     except KeyboardInterrupt:
