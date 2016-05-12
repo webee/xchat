@@ -123,6 +123,22 @@
                             "directory": "../../../static"
                         }
                     }
+                },
+                {
+                    "type": "rawsocket",
+                    "options": {
+                        "access_log": true
+                    },
+                    "endpoint": {
+                        "type": "unix",
+                        "path": "/tmp/crossbar-broker-sock1"
+                    },
+                    "auth": {
+                        "anonymous": {
+                            "type": "static",
+                            "role": "xchat"
+                        }
+                    }
                 }
             ],
             "components": [
