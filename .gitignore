@@ -3,3 +3,4 @@ venv/
 *.py[cod]
 *.sqlite*
 __pycache__/
+test/

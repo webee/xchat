@@ -1,0 +1,19 @@
+{
+    "pid": 60280, 
+    "options": {
+        "reactor": null, 
+        "cdc": false, 
+        "config": "config.json", 
+        "logdir": null, 
+        "loglevel": "info", 
+        "colour": "auto", 
+        "command": "start", 
+        "cbdir": "/Users/webee/src/qqwj/im/xchat/src/cm/.crossbar", 
+        "logtofile": false, 
+        "logformat": "standard"
+    }, 
+    "argv": [
+        "/Users/webee/src/qqwj/im/xchat/venv/bin/crossbar", 
+        "start"
+    ]
+}

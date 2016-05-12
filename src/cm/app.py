@@ -3,6 +3,7 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 from autobahn.twisted.wamp import ApplicationSession
 from autobahn.wamp.types import SubscribeOptions, RegisterOptions
 import time
+from crochet import run_in_reactor
 
 
 @inlineCallbacks
@@ -19,11 +20,9 @@ class AppSession(ApplicationSession):
         self.profiles = {}
         ticker()
 
-    @inlineCallbacks
     def onLeave(self, details):
         print("session left", details)
 
-    @inlineCallbacks
     def onDisconnect(self):
         print("transport disconnected")
 
@@ -46,8 +45,13 @@ class AppSession(ApplicationSession):
 
         print(details)
         print("{authid}<{caller}> #{count} called add() with {x} and {y}.".format(count=profile['add'], caller=caller, authid=authid, x=x, y=y))
-        yield
+        if profile.get('is_online'):
+            yield self.publish('xchat.user.{}.msg'.format(caller), x + y)
         returnValue(x + y)
+
+    @run_in_reactor
+    def sleep(self, n):
+        time.sleep(n)
 
     @inlineCallbacks
     def mul(self, x, y, details=None):
@@ -56,7 +60,8 @@ class AppSession(ApplicationSession):
         profile.setdefault('mul', 0)
         profile['mul'] += 1
 
-        yield sleep(10)
+        yield self.sleep(20)
+        yield sleep(5)
         returnValue(x * y)
 
     @inlineCallbacks
@@ -66,6 +71,7 @@ class AppSession(ApplicationSession):
         if profile.setdefault('offline', None) is None:
             registration = yield self.register(self.offline, 'xchat.user.{}.offline'.format(caller), options=RegisterOptions(details_arg='details'))
             profile['offline'] = registration
+            profile['is_online'] = True
 
         returnValue({'ok': True})
 
@@ -74,8 +80,25 @@ class AppSession(ApplicationSession):
         profile = self.profiles.setdefault(caller, {})
         offline = profile.get('offline')
         if offline is not None:
+            del profile['offline']
             offline.unregister()
+            del profile['is_online']
         return {'ok': True}
 
-    def send_msg(self):
+    def send_msg(self, chat_id, msg, details=None):
+        caller = details.caller
+        user = details.caller_authid
         pass
+
+    def create_chat(self, details=None):
+        """
+        创建单聊
+        """
+        user = details.caller_authid
+        pass
+
+    def create_group_chat(self, details=None):
+        """
+        创建群聊
+        """
+        user = details.caller_authid
