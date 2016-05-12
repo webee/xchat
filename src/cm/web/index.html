@@ -15,7 +15,7 @@
 <script>
     // the URL of the WAMP Router (Crossbar.io)
     //
-    var wsuri = (document.location.protocol === "http:" ? "ws:" : "wss:") + "//localhost:48080/ws";
+    var wsuri = (document.location.protocol === "http:" ? "ws:" : "wss:") + "//" + document.location.host + "/ws";
 
     function onchallenge (session, method, extra) {
         console.log("onchallenge", method, extra);
