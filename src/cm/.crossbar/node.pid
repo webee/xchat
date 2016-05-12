@@ -1,19 +1,19 @@
 {
+    "pid": 67793, 
+    "options": {
+        "cbdir": "/Users/webee/src/qqwj/im/xchat/src/cm/.crossbar", 
+        "command": "start", 
+        "cdc": false, 
+        "logformat": "standard", 
+        "loglevel": "info", 
+        "reactor": null, 
+        "logtofile": false, 
+        "logdir": null, 
+        "colour": "auto", 
+        "config": "config.json"
+    }, 
     "argv": [
         "/Users/webee/src/qqwj/im/xchat/venv/bin/crossbar", 
         "start"
-    ], 
-    "pid": 65259, 
-    "options": {
-        "colour": "auto", 
-        "reactor": null, 
-        "cbdir": "/Users/webee/src/qqwj/im/xchat/src/cm/.crossbar", 
-        "logtofile": false, 
-        "logformat": "standard", 
-        "logdir": null, 
-        "config": "config.json", 
-        "command": "start", 
-        "cdc": false, 
-        "loglevel": "info"
-    }
+    ]
 }
