@@ -20,7 +20,7 @@
                     "name": "realm1",
                     "roles": [
                         {
-                            "name": "anonymous",
+                            "name": "public",
                             "permissions": [
                                 {
                                     "uri": "",
@@ -129,7 +129,7 @@
                                 },
                                 "anonymous": {
                                     "type": "static",
-                                    "role": "anonymous"
+                                    "role": "public"
                                 }
                             }
                         }
