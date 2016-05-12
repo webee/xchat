@@ -17,7 +17,7 @@
             },
             "realms": [
                 {
-                    "name": "test",
+                    "name": "realm1",
                     "roles": [
                         {
                             "name": "anonymous",
@@ -126,6 +126,10 @@
                                     "type": "dynamic",
                                     "authenticator": "xchat.authenticate.jwt",
                                     "authenticator-realm": "xchat-auth"
+                                },
+                                "anonymous": {
+                                    "type": "static",
+                                    "role": "anonymous"
                                 }
                             }
                         }
