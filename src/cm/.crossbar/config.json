@@ -17,7 +17,7 @@
             },
             "realms": [
                 {
-                    "name": "realm1",
+                    "name": "test",
                     "roles": [
                         {
                             "name": "anonymous",
@@ -30,6 +30,10 @@
                                         "register": true,
                                         "publish": true,
                                         "subscribe": true
+                                    },
+                                    "disclose": {
+                                        "caller": true,
+                                        "publisher": true
                                     },
                                     "cache": true
                                 }
@@ -44,7 +48,7 @@
                             "name": "authenticator",
                             "permissions": [
                                 {
-                                    "uri": "xchat.authenticate",
+                                    "uri": "xchat.authenticate.",
                                     "match": "prefix",
                                     "allow": {
                                         "call": false,
