@@ -167,16 +167,23 @@
                     }
                 },
                 {
-                    "type": "websocket",
+                    "type": "web",
                     "endpoint": {
                         "type": "tcp",
                         "port": 48079
                     },
-                    "url": "ws://127.0.0.1:48079/app/ws",
-                    "auth": {
-                        "anonymous": {
-                            "type": "static",
-                            "role": "xchat"
+                    "options": {
+                        "access_log": true
+                    },
+                    "paths": {
+                        "app/ws": {
+                            "type": "websocket",
+                            "auth": {
+                                "anonymous": {
+                                    "type": "static",
+                                    "role": "xchat"
+                                }
+                            }
                         }
                     }
                 }
