@@ -176,7 +176,7 @@
                         "access_log": true
                     },
                     "paths": {
-                        "app/ws": {
+                        "app-ws": {
                             "type": "websocket",
                             "auth": {
                                 "anonymous": {
