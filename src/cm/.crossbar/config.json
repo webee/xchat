@@ -172,7 +172,7 @@
                         "type": "tcp",
                         "port": 48079
                     },
-                    "url": "ws://localhost:48079/app/ws",
+                    "url": "ws://127.0.0.1:48079/app/ws",
                     "auth": {
                         "anonymous": {
                             "type": "static",
