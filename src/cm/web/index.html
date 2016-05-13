@@ -20,7 +20,7 @@
     function onchallenge (session, method, extra) {
         console.log("onchallenge", method, extra);
         if (method === "ticket") {
-            return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJ1c2VyIjoidGVzdCIsImV4cCI6MTQ2MzEwNDMxOCwib3JpZ19pYXQiOjE0NjI5NzQ3MTh9.9is7Anj5rh5-kzCbICBBXkoMUkDyUytDi6NaVvPa7hc";
+            return "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0NjYyMTgwNDgsInVzZXJuYW1lIjoidGVzdCIsInVzZXIiOiJ0ZXN0In0.b0Pcf-ANG86sXE4cfkV_6cHw84gjyMOV80bLqEZSPFw";
         } else {
             throw "don't know how to authenticate using '" + method + "'";
         }
