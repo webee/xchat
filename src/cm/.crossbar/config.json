@@ -85,7 +85,7 @@
                             "name": "user",
                             "permissions": [
                                 {
-                                    "uri": "",
+                                    "uri": "xchat.",
                                     "match": "prefix",
                                     "allow": {
                                         "call": true,
