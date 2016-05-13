@@ -165,6 +165,20 @@
                             "role": "xchat"
                         }
                     }
+                },
+                {
+                    "type": "websocket",
+                    "endpoint": {
+                        "type": "tcp",
+                        "port": 48079
+                    },
+                    "url": "ws://localhost:48079/ws",
+                    "auth": {
+                        "anonymous": {
+                            "type": "static",
+                            "role": "xchat"
+                        }
+                    }
                 }
             ],
             "components": [
