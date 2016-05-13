@@ -72,10 +72,10 @@
                                     "uri": "",
                                     "match": "prefix",
                                     "allow": {
-                                        "call": false,
+                                        "call": true,
                                         "register": true,
                                         "publish": true,
-                                        "subscribe": false
+                                        "subscribe": true
                                     },
                                     "cache": true
                                 }
