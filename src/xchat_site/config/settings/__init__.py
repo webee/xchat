@@ -79,7 +79,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'api_site.wsgi.application'
+WSGI_APPLICATION = 'xchat_site.wsgi.application'
 
 
 # Database
