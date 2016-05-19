@@ -1,8 +1,16 @@
-from calendar import timegm
-from datetime import datetime
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from rest_framework_jwt.settings import api_settings
-from rest_framework_jwt.compat import get_username, get_username_field
+from rest_framework import exceptions
+
+
+class VirtualUser(object):
+    def __init__(self, is_admin=False):
+        self.is_staff = is_admin
+
+    def __str__(self):
+        return 'VirtualUser'
+
+    def is_authenticated(self):
+        return True
 
 
 class JWTAuthentication(JSONWebTokenAuthentication):
@@ -10,28 +18,6 @@ class JWTAuthentication(JSONWebTokenAuthentication):
         jwt = super(JWTAuthentication, self).get_jwt_value(request)
         return jwt or request.query_params.get('jwt')
 
-
-def jwt_payload_handler(user):
-    username_field = get_username_field()
-    username = get_username(user)
-
-    payload = {
-        'app': username,
-        username_field: username,
-        'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA
-    }
-
-    # Include original issued at time for a brand new token,
-    # to allow token refresh
-    if api_settings.JWT_ALLOW_REFRESH:
-        payload['orig_iat'] = timegm(
-                datetime.utcnow().utctimetuple()
-        )
-
-    if api_settings.JWT_AUDIENCE is not None:
-        payload['aud'] = api_settings.JWT_AUDIENCE
-
-    if api_settings.JWT_ISSUER is not None:
-        payload['iss'] = api_settings.JWT_ISSUER
-
-    return payload
+    def authenticate_credentials(self, payload):
+        is_admin = payload.get("is_admin", False)
+        return VirtualUser(is_admin=is_admin)

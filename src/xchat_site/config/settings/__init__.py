@@ -142,14 +142,13 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
         'xchat.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'PAGE_SIZE': 20
 }
 
 JWT_AUTH = {
-    'JWT_PAYLOAD_HANDLER': 'xchat.authentication.jwt_payload_handler',
     'JWT_SECRET_KEY': USER_KEY,
     'JWT_ALGORITHM': 'HS256',
     'JWT_VERIFY': True,
