@@ -10,9 +10,9 @@ class MemberInline(admin.TabularInline):
 
 class ChatAdmin(admin.ModelAdmin):
     inlines = (MemberInline,)
-    list_filter = ['type']
+    list_filter = ['type', 'tag']
     search_fields = ['id', 'channel', 'title']
-    list_display = ('id', 'type', 'channel', 'title', 'owner', 'created', 'updated')
+    list_display = ('id', 'type', 'channel', 'title', 'owner', 'tag', 'created', 'updated')
 
 
 admin.site.register(Chat, ChatAdmin)
