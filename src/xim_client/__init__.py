@@ -101,7 +101,7 @@ class XIMClient(RestClient):
 
         Returns:
         """
-        members = members or None
+        members = members or []
         json = {'members': [{'user': m.user, 'can_pub': m.can_pub, 'can_sub': m.can_sub} for m in members]}
         if tag is not None:
             json['tag'] = tag
