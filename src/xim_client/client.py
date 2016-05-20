@@ -30,12 +30,12 @@ class RestClient(object):
         headers = headers or {}
         if not without_auth and self.get_token() is not None:
             headers['Authorization'] = 'Bearer ' + self.get_token()
-        logger.debug("request: %s, %s, %s, %s", url, data, json, params)
+        logger.debug("request: %s %s, %s, %s, %s", method, url, data, json, params)
         req = requests.request(method, self._host_url + url, data=data, json=json, params=params, headers=headers)
         try:
             status_code, data = req.status_code, req.json()
-            logger.debug("response: %s, %s, %s", url, status_code, data)
-            return Result(req.status_code, req.json())
+            logger.debug("response: %s %s, %s, %s", method, url, status_code, data)
+            return Result(req.status_code, data)
         except Exception as e:
             logger.error(e)
 

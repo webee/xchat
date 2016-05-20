@@ -92,17 +92,21 @@ class XIMClient(RestClient):
         if is_success_result(result):
             return result.data['token']
 
-    def create_channel(self, members=None, tag=None):
+    def create_channel(self, publishers=None, subscribers=None, tag=None):
         """
         创建包含成员members和tag的channel.
         Args:
-            members: 成员列表[{user, can_pub, can_sub}...]
+            publishers: 发布者列表[user1, user2,...]
+            subscribers: 订阅者列表[user1, user2,...]
             tag: tag
 
         Returns:
         """
-        members = members or []
-        json = {'members': [{'user': m.user, 'can_pub': m.can_pub, 'can_sub': m.can_sub} for m in members]}
+        json = {}
+        if publishers is not None:
+            json['publishers'] = publishers
+        if subscribers is not None:
+            json['subscribers'] = subscribers
         if tag is not None:
             json['tag'] = tag
         result = self.post(self.config.APP_CREATE_CHANNEL_URL, json=json)
@@ -110,7 +114,7 @@ class XIMClient(RestClient):
             return result.data['channel']
 
     def delete_channel(self, channel):
-        url = self.config.APP_GET_CHANNEL_URL.format(channel=channel)
+        url = self.config.APP_CHANNEL_URL.format(channel=channel)
         result = self.delete(url)
         if is_success_result(result):
             return result.data
@@ -122,50 +126,94 @@ class XIMClient(RestClient):
             channel: channel id
         Returns:
         """
-        url = self.config.APP_GET_CHANNEL_URL.format(channel=channel)
+        url = self.config.APP_CHANNEL_URL.format(channel=channel)
         result = self.get(url)
         if is_success_result(result):
             return result.data
 
-    def add_channel_members(self, channel, members):
+    def add_channel_publishers(self, channel, users):
         """
-        向channel中增加成员
+        向channel中增加发布者
         Args:
-            channel:
-            members:
+            channel: channel id
+            users: [user1, user2,...]
         Returns:
         """
-        url = self.config.APP_ADD_CHANNEL_MEMBERS_URL.format(channel=channel)
-        json = {'members': [{'user': m.user, 'can_pub': m.can_pub, 'can_sub': m.can_sub} for m in members]}
+        url = self.config.APP_CHANNEL_PUBLISHERS_URL.format(channel=channel)
+        json = {'users': users}
 
         result = self.post(url, json=json)
         if is_success_result(result):
             return result.data
 
-    def remove_channel_members(self, channel, users):
+    def remove_channel_publishers(self, channel, users):
         """
-        从channel中删除成员.
+        从channel中删除发布者.
         Args:
-            channel:
-            users:
+            channel: channel id
+            users: [user1, user2,...]
 
         Returns:
         """
-        url = self.config.APP_ADD_CHANNEL_MEMBERS_URL.format(channel=channel)
-        json = {'users': [user for user in users]}
+        url = self.config.APP_CHANNEL_PUBLISHERS_URL.format(channel=channel)
+        json = {'users': users}
 
         result = self.delete(url, json=json)
         if is_success_result(result):
             return result.data
 
-    def get_channel_members(self, channel):
+    def add_channel_subscribers(self, channel, users):
         """
-        获取channel成员列表
+        向channel中增加订阅者
         Args:
-            channel:
+            channel: channel id
+            users: [user1, user2,...]
         Returns:
         """
-        url = self.config.APP_ADD_CHANNEL_MEMBERS_URL.format(channel=channel)
+        url = self.config.APP_CHANNEL_SUBSCRIBERS_URL.format(channel=channel)
+        json = {'users': users}
+
+        result = self.post(url, json=json)
+        if is_success_result(result):
+            return result.data
+
+    def remove_channel_subscribers(self, channel, users):
+        """
+        从channel中删除订阅者.
+        Args:
+            channel: channel id
+            users: [user1, user2,...]
+
+        Returns:
+        """
+        url = self.config.APP_CHANNEL_SUBSCRIBERS_URL.format(channel=channel)
+        json = {'users': users}
+
+        result = self.delete(url, json=json)
+        if is_success_result(result):
+            return result.data
+
+    def get_channel_publishers(self, channel):
+        """
+        获取channel发布者列表
+        Args:
+            channel: channel id
+        Returns:
+        """
+        url = self.config.APP_CHANNEL_PUBLISHERS_URL.format(channel=channel)
+
+        result = self.get(url)
+        if is_success_result(result):
+            return result.data
+
+    def get_channel_subscribers(self, channel):
+        """
+        获取channel订阅者列表
+        Args:
+            channel: channel id
+        Returns:
+        """
+        url = self.config.APP_CHANNEL_PUBLISHERS_URL.format(channel=channel)
 
         result = self.get(url)
         if is_success_result(result):

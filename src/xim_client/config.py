@@ -7,7 +7,7 @@ class XIMClientConfig:
     APP_NEW_USER_TOKEN_URL = '/xim/app.new_user_token'
 
     APP_CREATE_CHANNEL_URL = '/xim/app/channels/'
-    APP_GET_CHANNEL_URL = '/xim/app/channels/{channel}/'
-    APP_ADD_CHANNEL_MEMBERS_URL = '/xim/app/channels/{channel}.members'
-    APP_GET_CHANNEL_MEMBERS_URL = '/xim/app/channels/{channel}.members'
+    APP_CHANNEL_URL = '/xim/app/channels/{channel}/'
+    APP_CHANNEL_PUBLISHERS_URL = '/xim/app/channels/{channel}.publishers'
+    APP_CHANNEL_SUBSCRIBERS_URL = '/xim/app/channels/{channel}.subscribers'
 
