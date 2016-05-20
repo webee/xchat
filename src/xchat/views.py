@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.http.response import JsonResponse
 import xim_client
 import time
-from .models import Chat, Member
+from .models import Chat, Member, ChatType
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 
 
@@ -29,7 +29,7 @@ class CreateChatView(APIView):
         serializer = ChatSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                chat = serializer.save(users=request.data.get("users", []))
+                chat = serializer.save()
                 return Response({"id": chat.id}, status=status.HTTP_201_CREATED)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -58,9 +58,9 @@ class ChatView(APIView):
     def delete(self, request, chat_id):
         client = xim_client.get_client()
         chat = self.get_chat(chat_id)
-        if client.delete_channel(chat.channel):
-            deleted = chat.delete()
-            return Response({'ok': True, 'deleted': deleted})
+        if client.close_channel(chat.channel):
+            _ = self.get_queryset(chat_id).update(is_deleted=True)
+            return Response({'ok': True})
         return Response({'ok': False})
 
 
@@ -76,26 +76,30 @@ class MembersView(APIView):
 
     def get(self, request, chat_id, format=None):
         chat = self.get_chat(chat_id)
-        serializer = MemberSerializer(chat.members.all(), many=True)
+        serializer = MemberSerializer(chat.member_set.all(), many=True)
         return Response(serializer.data)
 
     def post(self, request, chat_id, format=None):
         chat = self.get_chat(chat_id)
+        if chat.type in [ChatType.SELF, ChatType.USER]:
+            return Response({'ok': False}, status=status.HTTP_403_FORBIDDEN)
         serializer = MembersSerializer(data=request.data)
         if serializer.is_valid():
-            created = serializer.save(chat=chat)
+            chat = serializer.save(chat=chat)
             return Response({
-                'ok': True,
-                'created': created
+                'ok': True
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, chat_id, format=None):
         chat = self.get_chat(chat_id)
+        if chat.type in [ChatType.SELF, ChatType.USER]:
+            return Response({'ok': False}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = MembersSerializer(data=request.data)
         if serializer.is_valid():
             users = serializer.validated_data['users']
-            deleted, _ = chat.members.filter(user__in=users).delete()
+            deleted, _ = chat.member_set.filter(user__user__in=users).delete()
             if deleted > 0:
                 chat.save()
             return Response({

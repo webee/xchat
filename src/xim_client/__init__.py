@@ -113,9 +113,15 @@ class XIMClient(RestClient):
         if is_success_result(result):
             return result.data['channel']
 
-    def delete_channel(self, channel):
+    def close_channel(self, channel):
         url = self.config.APP_CHANNEL_URL.format(channel=channel)
         result = self.delete(url)
+        if is_success_result(result):
+            return result.data
+
+    def open_channel(self, channel):
+        url = self.config.APP_CHANNEL_URL.format(channel=channel)
+        result = self.put(url)
         if is_success_result(result):
             return result.data
 

@@ -1,11 +1,15 @@
-from .models import Chat, Member
+from .models import Chat, Member, User
 from django.contrib import admin
+
+
+class UserAdmin(admin.ModelAdmin):
+    search_fields = ['id', 'user']
+    list_display = ('id', 'user')
 
 
 class MemberInline(admin.TabularInline):
     model = Member
-    can_delete = True
-    verbose_name = 'member'
+    extra = 1
 
 
 class ChatAdmin(admin.ModelAdmin):
@@ -15,4 +19,5 @@ class ChatAdmin(admin.ModelAdmin):
     list_display = ('id', 'type', 'channel', 'title', 'owner', 'tag', 'created', 'updated')
 
 
+admin.site.register(User, UserAdmin)
 admin.site.register(Chat, ChatAdmin)
