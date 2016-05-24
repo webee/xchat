@@ -3,11 +3,11 @@ from django.http import Http404
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser
 from django.http.response import JsonResponse
 import xim_client
 import time
-from .models import Chat, Member, ChatType
+from .models import Chat, ChatType
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 
 
@@ -85,10 +85,14 @@ class MembersView(APIView):
             return Response({'ok': False}, status=status.HTTP_403_FORBIDDEN)
         serializer = MembersSerializer(data=request.data)
         if serializer.is_valid():
-            chat = serializer.save(chat=chat)
+            ret = serializer.save(chat=chat)
+            if ret:
+                return Response({
+                    'ok': True
+                }, status=status.HTTP_201_CREATED)
             return Response({
-                'ok': True
-            }, status=status.HTTP_201_CREATED)
+                'ok': False
+            }, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, chat_id, format=None):
@@ -99,11 +103,18 @@ class MembersView(APIView):
         serializer = MembersSerializer(data=request.data)
         if serializer.is_valid():
             users = serializer.validated_data['users']
-            deleted, _ = chat.member_set.filter(user__user__in=users).delete()
-            if deleted > 0:
-                chat.save()
+            client = xim_client.get_client()
+            if client.remove_channel_subscribers(chat.channel, users):
+                if client.remove_channel_publishers(chat.channel, users):
+                    deleted, _ = chat.member_set.filter(user__user__in=users).delete()
+                    if deleted > 0:
+                        chat.save()
+                    return Response({
+                        'ok': True,
+                        'deleted': deleted
+                    }, status=status.HTTP_200_OK)
             return Response({
-                'ok': True,
-                'deleted': deleted
-            }, status=status.HTTP_200_OK)
+                'ok': False,
+                'deleted': 0
+            }, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
