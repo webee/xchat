@@ -224,3 +224,16 @@ class XIMClient(RestClient):
         result = self.get(url)
         if is_success_result(result):
             return result.data
+
+    def get_channel_msg_last_id(self, channel):
+        """
+        获取channel最新消息id
+        Args:
+            channel: channel id
+        Returns:
+        """
+        url = self.config.APP_CHANNEL_MSG_LAST_ID.format(channel=channel)
+
+        result = self.get(url)
+        if is_success_result(result):
+            return result.data["id"]

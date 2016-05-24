@@ -54,6 +54,7 @@ class Member(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     created = models.DateTimeField(auto_now_add=True, editable=False)
+    init_id = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = _("Member")

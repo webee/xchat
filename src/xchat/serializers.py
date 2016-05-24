@@ -98,8 +98,9 @@ class MembersSerializer(serializers.Serializer):
         client = xim_client.get_client()
         if client.add_channel_subscribers(chat.channel, users) is not None:
             if client.add_channel_publishers(chat.channel, users) is not None:
+                id = client.get_channel_msg_last_id(chat.channel)
                 users = [User.objects.get_or_create(user=user)[0] for user in users]
                 for m in users:
-                    Member.objects.get_or_create(chat=chat, user=m)
+                    Member.objects.get_or_create(chat=chat, user=m, init_id=id)
                 return True
         return False

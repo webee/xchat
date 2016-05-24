@@ -10,4 +10,4 @@ class XIMClientConfig:
     APP_CHANNEL_URL = '/xim/app/channels/{channel}/'
     APP_CHANNEL_PUBLISHERS_URL = '/xim/app/channels/{channel}.publishers'
     APP_CHANNEL_SUBSCRIBERS_URL = '/xim/app/channels/{channel}.subscribers'
-
+    APP_CHANNEL_MSG_LAST_ID = '/xim/app/msg/{channel}/last_id'
