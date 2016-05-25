@@ -96,11 +96,11 @@ class MembersSerializer(serializers.Serializer):
         users = validated_data['users']
 
         client = xim_client.get_client()
-        if client.add_channel_subscribers(chat.channel, users) is not None:
-            if client.add_channel_publishers(chat.channel, users) is not None:
-                id = client.get_channel_msg_last_id(chat.channel)
-                users = [User.objects.get_or_create(user=user)[0] for user in users]
-                for m in users:
-                    Member.objects.get_or_create(chat=chat, user=m, init_id=id)
-                return True
+        data = client.add_channel_pub_subs(chat.channel, users, users)
+        if data is not None:
+            last_id = data["last_id"]
+            users = [User.objects.get_or_create(user=user)[0] for user in users]
+            for m in users:
+                Member.objects.get_or_create(chat=chat, user=m, init_id=last_id)
+            return True
         return False
