@@ -104,9 +104,9 @@ class XIMClient(RestClient):
         """
         json = {}
         if publishers is not None:
-            json['publishers'] = publishers
+            json['pubs'] = publishers
         if subscribers is not None:
-            json['subscribers'] = subscribers
+            json['subs'] = subscribers
         if tag is not None:
             json['tag'] = tag
         result = self.post(self.config.APP_CREATE_CHANNEL_URL, json=json)
@@ -153,7 +153,8 @@ class XIMClient(RestClient):
             json['pubs'] = publishers
         if subscribers is not None:
             json['subs'] = subscribers
-        result = self.post(self.config.APP_CHANNEL_PUBSUBS_URL, json=json)
+        url = self.config.APP_CHANNEL_PUBSUBS_URL.format(channel=channel)
+        result = self.post(url, json=json)
         if is_success_result(result):
             return result.data
 
@@ -173,7 +174,8 @@ class XIMClient(RestClient):
             json['pubs'] = publishers
         if subscribers is not None:
             json['subs'] = subscribers
-        result = self.delete(self.config.APP_CHANNEL_PUBSUBS_URL, json=json)
+        url = self.config.APP_CHANNEL_PUBSUBS_URL.format(channel=channel)
+        result = self.delete(url, json=json)
         if is_success_result(result):
             return result.data
 

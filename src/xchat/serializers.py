@@ -15,6 +15,7 @@ class MemberSerializer(serializers.ModelSerializer):
 class ChatSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
     channel = serializers.ReadOnlyField()
+    is_deleted = serializers.ReadOnlyField()
     users = serializers.ListField(required=False, write_only=True,
                                   child=serializers.CharField(allow_blank=False, max_length=32), default=[])
 
