@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAdminUser
 from django.http.response import JsonResponse
 import xim_client
 import time
-from .models import Chat, ChatType
+from .models import Chat, ChatType, User
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 
 
@@ -20,6 +20,29 @@ class TestView(APIView):
 
     def get(self, request):
         return Response({'ok': True, 't': time.time()})
+
+
+class UserChatsView(APIView):
+    permission_classes = (IsAdminUser,)
+
+    def get_user(self, user):
+        try:
+            return User.objects.get(user=user)
+        except User.DoesNotExist:
+            raise Http404
+
+    def get(self, request, format=None):
+        user = request.data.get("user")
+        user = self.get_user(user)
+        t = request.data.get("type")
+        tag = request.data.get("tag")
+        q = user.chats
+        if t is not None:
+            q = q.filter(type=t)
+        if tag is not None:
+            q = q.filter(tag=tag)
+        chats = q.all()
+        return Response([{"id": chat.id, "type": chat.type, "title": chat.title, "tag": chat.tag} for chat in chats])
 
 
 class CreateChatView(APIView):
