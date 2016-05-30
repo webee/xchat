@@ -32,14 +32,14 @@ class UserChatsView(APIView):
             raise Http404
 
     def get(self, request, format=None):
-        user = request.data.get("user")
+        user = request.query_params.get("user")
         user = self.get_user(user)
-        t = request.data.get("type")
-        tag = request.data.get("tag")
+        t = request.query_params.get("type")
+        tag = request.query_params.get("tag")
         q = user.chats
-        if t is not None:
+        if t:
             q = q.filter(type=t)
-        if tag is not None:
+        if tag:
             q = q.filter(tag=tag)
         chats = q.all()
         return Response([{"id": chat.id, "type": chat.type, "title": chat.title, "tag": chat.tag} for chat in chats])
