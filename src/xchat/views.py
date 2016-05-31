@@ -127,15 +127,14 @@ class MembersView(APIView):
         if serializer.is_valid():
             users = serializer.validated_data['users']
             client = xim_client.get_client()
-            if client.remove_channel_subscribers(chat.channel, users):
-                if client.remove_channel_publishers(chat.channel, users):
-                    deleted, _ = chat.member_set.filter(user__user__in=users).delete()
-                    if deleted > 0:
-                        chat.save()
-                    return Response({
-                        'ok': True,
-                        'deleted': deleted
-                    }, status=status.HTTP_200_OK)
+            if client.remove_channel_pub_subs(chat.channel, users, users):
+                deleted, _ = chat.member_set.filter(user__user__in=users).delete()
+                if deleted > 0:
+                    chat.save()
+                return Response({
+                    'ok': True,
+                    'deleted': deleted
+                }, status=status.HTTP_200_OK)
             return Response({
                 'ok': False,
                 'deleted': 0

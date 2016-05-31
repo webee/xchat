@@ -179,68 +179,6 @@ class XIMClient(RestClient):
         if is_success_result(result):
             return result.data
 
-    def add_channel_publishers(self, channel, users):
-        """
-        向channel中增加发布者
-        Args:
-            channel: channel id
-            users: [user1, user2,...]
-        Returns:
-        """
-        url = self.config.APP_CHANNEL_PUBLISHERS_URL.format(channel=channel)
-        json = {'pubs': users}
-
-        result = self.post(url, json=json)
-        if is_success_result(result):
-            return result.data
-
-    def remove_channel_publishers(self, channel, users):
-        """
-        从channel中删除发布者.
-        Args:
-            channel: channel id
-            users: [user1, user2,...]
-
-        Returns:
-        """
-        url = self.config.APP_CHANNEL_PUBLISHERS_URL.format(channel=channel)
-        json = {'pubs': users}
-
-        result = self.delete(url, json=json)
-        if is_success_result(result):
-            return result.data
-
-    def add_channel_subscribers(self, channel, users):
-        """
-        向channel中增加订阅者
-        Args:
-            channel: channel id
-            users: [user1, user2,...]
-        Returns:
-        """
-        url = self.config.APP_CHANNEL_SUBSCRIBERS_URL.format(channel=channel)
-        json = {'subs': users}
-
-        result = self.post(url, json=json)
-        if is_success_result(result):
-            return result.data
-
-    def remove_channel_subscribers(self, channel, users):
-        """
-        从channel中删除订阅者.
-        Args:
-            channel: channel id
-            users: [user1, user2,...]
-
-        Returns:
-        """
-        url = self.config.APP_CHANNEL_SUBSCRIBERS_URL.format(channel=channel)
-        json = {'subs': users}
-
-        result = self.delete(url, json=json)
-        if is_success_result(result):
-            return result.data
-
     def get_channel_pubsubs(self, channel):
         """
         获取channel发布者和订阅者列表
