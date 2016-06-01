@@ -6,55 +6,40 @@ class ChatType:
     SELF = "self"
     USER = "user"
     GROUP = "group"
-    ROOM = "room"
 
 ChatTypeChoices = [
     (ChatType.SELF, "自聊"),
     (ChatType.USER, "单聊"),
     (ChatType.GROUP, "群聊"),
-    (ChatType.ROOM, "房间"),
 ]
 
 ChatTypes = {c[0] for c in ChatTypeChoices}
 
 
-class User(models.Model):
-    user = models.CharField(max_length=32, null=False, unique=True)
-
-    class Meta:
-        verbose_name = _("User")
-        verbose_name_plural = _("Users")
-
-    def __str__(self):
-        return self.user
-
-
 class Chat(models.Model):
     type = models.CharField(max_length=10, choices=ChatTypeChoices)
-    channel = models.CharField(max_length=8, unique=True, null=False)
     title = models.CharField(max_length=64, null=True, default="", blank=True)
-    owner = models.CharField(max_length=32, null=True, blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
-    is_deleted = models.BooleanField(default=False)
-    members = models.ManyToManyField(User, through='Member', related_name="chats")
+    msg_id = models.BigIntegerField(default=0)
 
+    is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    updated = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
         verbose_name = _("Chat")
         verbose_name_plural = _("Chats")
 
     def __str__(self):
-        return "%s:%s" % (self.type, self.channel)
+        return "%s:#%d" % (self.type, self.id)
 
 
 class Member(models.Model):
-    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="members")
+    user = models.CharField(max_length=32, null=False, db_index=True)
 
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    init_id = models.IntegerField(default=0)
+    init_id = models.BigIntegerField(default=0)
+    cur_id = models.BigIntegerField(default=0)
 
     class Meta:
         verbose_name = _("Member")
@@ -64,3 +49,20 @@ class Member(models.Model):
 
     def __str__(self):
         return "%s@%s" % (self.user, self.chat)
+
+
+class Message(models.Model):
+    chat_id = models.BigIntegerField()
+    msg_id = models.BigIntegerField()
+    ts = models.DateTimeField(auto_now_add=True)
+    msg = models.TextField()
+
+    class Meta:
+        db_table = "xchat_message"
+        verbose_name = _("Message")
+        verbose_name_plural = _("Messages")
+
+        unique_together = (("chat_id", "msg_id"),)
+
+    def __str__(self):
+        return "%d:%d:%s" % (self.chat_id, self.msg_id, self.ts)

@@ -5,9 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.http.response import JsonResponse
-import xim_client
 import time
-from .models import Chat, ChatType, User
+from .models import Chat, ChatType, Member
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 
 
@@ -25,24 +24,16 @@ class TestView(APIView):
 class UserChatsView(APIView):
     permission_classes = (IsAdminUser,)
 
-    def get_user(self, user):
-        try:
-            return User.objects.get(user=user)
-        except User.DoesNotExist:
-            raise Http404
-
-    def get(self, request, format=None):
+    def get(self, request):
         user = request.query_params.get("user")
-        user = self.get_user(user)
         t = request.query_params.get("type")
         tag = request.query_params.get("tag")
-        q = user.chats
+        members = Member.objects.select_related().filter(user=user)
         if t:
-            q = q.filter(type=t)
+            members = members.filter(chat__type=t)
         if tag:
-            q = q.filter(tag=tag)
-        chats = q.all()
-        return Response([{"id": chat.id, "type": chat.type, "title": chat.title, "tag": chat.tag} for chat in chats])
+            members = members.filter(chat__tag=tag)
+        return Response([{"id": m.chat.id, "type": m.chat.type, "title": m.chat.title, "tag": m.chat.tag, 'msg_id': m.chat.msg_id} for m in members])
 
 
 class CreateChatView(APIView):
@@ -72,19 +63,15 @@ class ChatView(APIView):
         except Chat.DoesNotExist:
             raise Http404
 
-    def get(self, request, chat_id, format=None):
+    def get(self, request, chat_id):
         chat = self.get_chat(chat_id)
         serializer = ChatSerializer(chat, context={'request': request})
         return Response(serializer.data)
 
     @transaction.atomic
     def delete(self, request, chat_id):
-        client = xim_client.get_client()
-        chat = self.get_chat(chat_id)
-        if client.close_channel(chat.channel):
-            _ = self.get_queryset(chat_id).update(is_deleted=True)
-            return Response({'ok': True})
-        return Response({'ok': False})
+        _ = self.get_queryset(chat_id).update(is_deleted=True)
+        return Response({'ok': True})
 
 
 class MembersView(APIView):
@@ -99,7 +86,7 @@ class MembersView(APIView):
 
     def get(self, request, chat_id, format=None):
         chat = self.get_chat(chat_id)
-        serializer = MemberSerializer(chat.member_set.all(), many=True)
+        serializer = MemberSerializer(chat.members.all(), many=True)
         return Response(serializer.data)
 
     def post(self, request, chat_id, format=None):
@@ -108,14 +95,10 @@ class MembersView(APIView):
             return Response({'ok': False}, status=status.HTTP_403_FORBIDDEN)
         serializer = MembersSerializer(data=request.data)
         if serializer.is_valid():
-            ret = serializer.save(chat=chat)
-            if ret:
-                return Response({
-                    'ok': True
-                }, status=status.HTTP_201_CREATED)
+            _ = serializer.save(chat=chat)
             return Response({
-                'ok': False
-            }, status=status.HTTP_400_BAD_REQUEST)
+                'ok': True
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, chat_id, format=None):
@@ -126,17 +109,10 @@ class MembersView(APIView):
         serializer = MembersSerializer(data=request.data)
         if serializer.is_valid():
             users = serializer.validated_data['users']
-            client = xim_client.get_client()
-            if client.remove_channel_pub_subs(chat.channel, users, users):
-                deleted, _ = chat.member_set.filter(user__user__in=users).delete()
-                if deleted > 0:
-                    chat.save()
-                return Response({
-                    'ok': True,
-                    'deleted': deleted
-                }, status=status.HTTP_200_OK)
+            deleted, _ = chat.members.filter(user__in=users).delete()
+            if deleted > 0:
+                chat.save()
             return Response({
-                'ok': False,
-                'deleted': 0
-            }, status=status.HTTP_400_BAD_REQUEST)
+                'ok': True
+            }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
