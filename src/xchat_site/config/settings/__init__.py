@@ -26,8 +26,6 @@ BASE_DIR = proj_root
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '4w6%)y_=gz3t_52bw5qwh6ms34^t&p4e7z+=k3q14j2-0xvyz$'
-XIM_APP = 'test'
-XIM_PASSWORD = 'test1234'
 USER_KEY = 'demo app user key.'
 
 # SECURITY WARNING: don't run with debug turned on in production!

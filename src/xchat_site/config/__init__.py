@@ -8,8 +8,6 @@ PROJECT_ROOT = get_project_root(target='src')
 def load_config(env):
     register_config(__name__, 'settings', env=env)
 
-    register_config(__name__, 'etc', env=env)
-
 
 load_config(os.getenv('ENV', 'default'))
 
