@@ -49,20 +49,3 @@ class Member(models.Model):
 
     def __str__(self):
         return "%s@%s" % (self.user, self.chat)
-
-
-class Message(models.Model):
-    chat_id = models.BigIntegerField()
-    msg_id = models.BigIntegerField()
-    ts = models.DateTimeField(auto_now_add=True)
-    msg = models.TextField()
-
-    class Meta:
-        db_table = "xchat_message"
-        verbose_name = _("Message")
-        verbose_name_plural = _("Messages")
-
-        unique_together = (("chat_id", "msg_id"),)
-
-    def __str__(self):
-        return "%d:%d:%s" % (self.chat_id, self.msg_id, self.ts)
