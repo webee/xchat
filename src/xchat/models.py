@@ -38,7 +38,6 @@ class Member(models.Model):
     user = models.CharField(max_length=32, null=False, db_index=True)
 
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    init_id = models.BigIntegerField(default=0)
     cur_id = models.BigIntegerField(default=0)
 
     class Meta:

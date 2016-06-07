@@ -6,7 +6,7 @@ from .models import Chat, Member, ChatTypes, ChatType
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ('user', 'init_id', 'cur_id', 'created')
+        fields = ('user', 'cur_id', 'created')
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -79,5 +79,5 @@ class MembersSerializer(serializers.Serializer):
         users = validated_data['users']
 
         for user in users:
-            Member.objects.get_or_create(chat=chat, user=user, init_id=chat.msg_id)
+            Member.objects.get_or_create(chat=chat, user=user, cur_id=chat.msg_id)
         return True
