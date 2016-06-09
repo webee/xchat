@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.http.response import JsonResponse
 import time
-from .models import Chat, ChatType, Member
+from .models import Room, Chat, ChatType, Member
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 
 
@@ -39,11 +39,18 @@ class UserChatsView(APIView):
 class CreateChatView(APIView):
     permission_classes = (IsAdminUser,)
 
-    def post(self, request):
+    def get_room(self, room_id):
+        try:
+            return Room.objects.get(pk=room_id)
+        except Room.DoesNotExist:
+            return None
+
+    def post(self, request, room_id=None):
+        room = self.get_room(room_id)
         serializer = ChatSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                chat = serializer.save()
+                chat = serializer.save(room=room)
                 return Response({"id": chat.id}, status=status.HTTP_201_CREATED)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

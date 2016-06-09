@@ -25,6 +25,13 @@ class Room(models.Model):
     is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
 
+    class Meta:
+        verbose_name = _("Room")
+        verbose_name_plural = _("Rooms")
+
+    def __str__(self):
+        return "#%d:%s" % (self.id, self.title)
+
 
 class Chat(models.Model):
     type = models.CharField(max_length=10, choices=ChatTypeChoices)
