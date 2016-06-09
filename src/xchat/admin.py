@@ -1,4 +1,4 @@
-from .models import Chat, Member
+from .models import Chat, Member, DeviceInfo
 from django.contrib import admin
 
 
@@ -14,4 +14,11 @@ class ChatAdmin(admin.ModelAdmin):
     list_display = ('id', 'type', 'title', 'tag', 'created')
 
 
+class DeviceInfoAdmin(admin.ModelAdmin):
+    list_filter = ['user', 'dev']
+    search_fields = ['user', 'dev', 'dev_id']
+    list_display = ('user', 'dev', 'dev_id')
+
+
 admin.site.register(Chat, ChatAdmin)
+admin.site.register(DeviceInfo, DeviceInfoAdmin)

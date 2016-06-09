@@ -42,9 +42,29 @@ class Member(models.Model):
 
     class Meta:
         verbose_name = _("Member")
-        verbose_name_plural = _("Member")
+        verbose_name_plural = _("Members")
 
         unique_together = (('chat', 'user'),)
 
     def __str__(self):
         return "%s@%s" % (self.user, self.chat)
+
+
+class DeviceInfo(models.Model):
+    """ 记录用户设备信息, 作进一步处理(离线消息推送等)
+    """
+    user = models.CharField(max_length=32, null=False, db_index=True)
+    dev = models.CharField(max_length=32, null=False)
+    dev_id = models.CharField(max_length=256, null=False)
+    info = models.TextField()
+
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Device info")
+        verbose_name_plural = _("Device infos")
+
+        unique_together = (('user', 'dev', 'dev_id'),)
+
+    def __str__(self):
+        return "%s@%s" % (self.user, self.dev_id)
