@@ -6,14 +6,24 @@ class ChatType:
     SELF = "self"
     USER = "user"
     GROUP = "group"
+    CS = "cs"
 
 ChatTypeChoices = [
     (ChatType.SELF, "自聊"),
     (ChatType.USER, "单聊"),
     (ChatType.GROUP, "群聊"),
+    (ChatType.CS, "客服"),
 ]
 
 ChatTypes = {c[0] for c in ChatTypeChoices}
+
+
+class Room(models.Model):
+    title = models.CharField(max_length=64, null=True, default="", blank=True)
+    tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
+
+    is_deleted = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
 
 
 class Chat(models.Model):
@@ -21,6 +31,10 @@ class Chat(models.Model):
     title = models.CharField(max_length=64, null=True, default="", blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
     msg_id = models.BigIntegerField(default=0)
+
+    # 所属房间, 可以为null表示为系统房间
+    # 房间中可以有 self, user, group, cs等会话,
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="chats", null=True)
 
     is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)

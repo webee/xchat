@@ -1,5 +1,16 @@
-from .models import Chat, Member, DeviceInfo
+from .models import Room, Chat, Member, DeviceInfo
 from django.contrib import admin
+
+
+class ChatInline(admin.TabularInline):
+    model = Chat
+    extra = 1
+
+
+class RoomAdmin(admin.ModelAdmin):
+    inlines = (ChatInline,)
+    search_fields = ['id', 'title', 'tag']
+    list_display = ('id', 'title', 'tag', 'is_deleted', 'created')
 
 
 class MemberInline(admin.TabularInline):
@@ -10,8 +21,8 @@ class MemberInline(admin.TabularInline):
 class ChatAdmin(admin.ModelAdmin):
     inlines = (MemberInline,)
     list_filter = ['type', 'tag']
-    search_fields = ['id', 'title']
-    list_display = ('id', 'type', 'title', 'tag', 'created')
+    search_fields = ['id', 'title', 'tag']
+    list_display = ('id', 'type', 'title', 'tag', 'room', 'is_deleted', 'created')
 
 
 class DeviceInfoAdmin(admin.ModelAdmin):
@@ -20,5 +31,6 @@ class DeviceInfoAdmin(admin.ModelAdmin):
     list_display = ('user', 'dev', 'dev_id')
 
 
+admin.site.register(Room, RoomAdmin)
 admin.site.register(Chat, ChatAdmin)
 admin.site.register(DeviceInfo, DeviceInfoAdmin)
