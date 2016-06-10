@@ -41,7 +41,7 @@ class Chat(models.Model):
 
     # 所属房间, 可以为null表示为系统房间
     # 房间中可以有 self, user, group, cs等会话,
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="chats", null=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="chats", null=True, editable=False)
 
     is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
