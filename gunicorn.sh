@@ -9,7 +9,7 @@ NAME=$(basename $PROJ_ROOT)
 SRC_DIR=${PROJ_ROOT}/src
 VENV_DIR=${PROJ_ROOT}/venv
 
-echo "Starting $NAME"
+echo "Starting $NAME $env"
 source ${VENV_DIR}/bin/activate
 export PYTHONPATH=${SRC_DIR}:${PYTHONPATH}
 export ENV=${env}
