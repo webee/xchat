@@ -18,4 +18,9 @@ exec gunicorn -c ${PROJ_ROOT}/deploy/gunicorn.conf.py -b 127.0.0.1:${port} \
   --name ${NAME} \
   -k gevent \
   -w ${NUM_WORKERS} \
+  --max-requests 10240 \
+  --max-requests-jitter 100 \
+  --access-logfile ${PROJ_ROOT}/logs/access.log \
+  --error-logfile ${PROJ_ROOT}/logs/error.log \
+  --log-level warning \
   ${NAME}_site.wsgi
