@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.http.response import JsonResponse
 import time
-from .models import Room, Chat, ChatType, Member
+from .models import Chat, ChatType, Member
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 
 

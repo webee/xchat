@@ -32,7 +32,7 @@ class Room(models.Model):
         verbose_name_plural = _("Rooms")
 
     def __str__(self):
-        return "#%d:%s" % (self.id, self.title)
+        return "room:%d" % (self.id,)
 
 
 class Chat(models.Model):
@@ -56,14 +56,17 @@ class Chat(models.Model):
 
 class RoomChat(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="chats", null=True, editable=False)
+    seq = models.IntegerField(default=0)
     chat = models.OneToOneField(Chat)
 
     class Meta:
         verbose_name = _("RoomChat")
         verbose_name_plural = _("RoomChats")
 
+        unique_together = (('room', 'seq'),)
+
     def __str__(self):
-        return "%s, %s" % (self.room, self.chat)
+        return "%s#%d->%s" % (self.room, self.seq, self.chat)
 
 
 class Member(models.Model):
