@@ -1,14 +1,14 @@
-from .models import Room, Chat, Member
+from .models import Room, Chat, Member, RoomChat
 from django.contrib import admin
 
 
-class ChatInline(admin.TabularInline):
-    model = Chat
+class RoomChatInline(admin.TabularInline):
+    model = RoomChat
     extra = 1
 
 
 class RoomAdmin(admin.ModelAdmin):
-    inlines = (ChatInline,)
+    inlines = (RoomChatInline,)
     search_fields = ['id', 'title', 'tag']
     list_display = ('id', 'title', 'tag', 'is_deleted', 'created')
 
@@ -22,7 +22,7 @@ class ChatAdmin(admin.ModelAdmin):
     inlines = (MemberInline,)
     list_filter = ['type', 'tag']
     search_fields = ['id', 'title', 'tag']
-    list_display = ('id', 'type', 'title', 'tag', 'room', 'is_deleted', 'updated', 'created')
+    list_display = ('id', 'type', 'title', 'tag', 'is_deleted', 'updated', 'created')
 
 
 admin.site.register(Room, RoomAdmin)

@@ -39,10 +39,6 @@ class Chat(models.Model):
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
     msg_id = models.BigIntegerField(default=0)
 
-    # 所属房间, 可以为null表示为系统房间
-    # 房间中可以有 self, user, group, cs等会话,
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="chats", null=True, editable=False)
-
     is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     # 添加成员之后需要更新这里
@@ -53,7 +49,19 @@ class Chat(models.Model):
         verbose_name_plural = _("Chats")
 
     def __str__(self):
-        return "%s:#%d" % (self.type, self.id)
+        return "%s:#%d:%s" % (self.type, self.id, self.tag)
+
+
+class RoomChat(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="chats", null=True, editable=False)
+    chat = models.OneToOneField(Chat)
+
+    class Meta:
+        verbose_name = _("RoomChat")
+        verbose_name_plural = _("RoomChats")
+
+    def __str__(self):
+        return "%s, %s" % (self.room, self.chat)
 
 
 class Member(models.Model):

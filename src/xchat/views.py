@@ -39,55 +39,15 @@ class UserChatsView(APIView):
 class CreateChatView(APIView):
     permission_classes = (IsAdminUser,)
 
-    def get_room(self, room_id):
-        try:
-            return Room.objects.get(pk=room_id)
-        except Room.DoesNotExist:
-            return None
-
-    def post(self, request, room_id=None):
-        room = self.get_room(room_id)
+    def post(self, request):
         serializer = ChatSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                chat = serializer.save(room=room)
+                chat = serializer.save()
                 return Response({"id": chat.id}, status=status.HTTP_201_CREATED)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class EnterRoomView(APIView):
-    permission_classes = (IsAdminUser,)
-
-    def get_room(self, room_id):
-        try:
-            return Room.objects.get(pk=room_id)
-        except Room.DoesNotExist:
-            return None
-
-    @transaction.atomic
-    def get(self, request, room_id=None):
-        room = self.get_room(room_id)
-        if room is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        user = request.query_params.get("user")
-        if not user:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        chat = room.chats.filter(members__user=user).first()
-        if chat is None:
-            chat = room.chats.annotate(mc=models.Count('members')).filter(mc__lt=1000).order_by('-mc').first()
-            if chat is None:
-                # create one chat.
-                chat = Chat(type=ChatType.GROUP, tag='_room', room=room)
-            # update
-            chat.save()
-
-            # add user to chat.
-            _ = chat.members.get_or_create(cur_id=chat.msg_id, user=user)
-        return Response({"chat_id": chat.id})
 
 
 class ChatView(APIView):

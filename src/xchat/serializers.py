@@ -40,7 +40,6 @@ class ChatSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        room = validated_data.get("room")
         t = validated_data['type']
         users = validated_data['users']
 
@@ -60,7 +59,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
         tag = validated_data.get('tag', '')
         title = validated_data.get('title', '')
-        chat = Chat(type=t, tag=tag, title=title, room=room)
+        chat = Chat(type=t, tag=tag, title=title)
         chat.save()
 
         for user in users:
