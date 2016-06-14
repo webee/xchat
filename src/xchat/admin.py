@@ -22,7 +22,7 @@ class ChatAdmin(admin.ModelAdmin):
     inlines = (MemberInline,)
     list_filter = ['type', 'tag']
     search_fields = ['id', 'title', 'tag']
-    list_display = ('id', 'type', 'title', 'tag', 'room', 'is_deleted', 'created')
+    list_display = ('id', 'type', 'title', 'tag', 'room', 'is_deleted', 'updated', 'created')
 
 
 admin.site.register(Room, RoomAdmin)

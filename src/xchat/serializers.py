@@ -81,4 +81,6 @@ class MembersSerializer(serializers.Serializer):
 
         for user in users:
             Member.objects.get_or_create(chat=chat, user=user, cur_id=chat.msg_id)
+        # update
+        chat.save()
         return True

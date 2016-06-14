@@ -45,6 +45,8 @@ class Chat(models.Model):
 
     is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
+    # 添加成员之后需要更新这里
+    updated = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
         verbose_name = _("Chat")

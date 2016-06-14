@@ -82,7 +82,9 @@ class EnterRoomView(APIView):
             if chat is None:
                 # create one chat.
                 chat = Chat(type=ChatType.GROUP, tag='_room', room=room)
-                chat.save()
+            # update
+            chat.save()
+
             # add user to chat.
             _ = chat.members.get_or_create(cur_id=chat.msg_id, user=user)
         return Response({"chat_id": chat.id})
@@ -149,6 +151,7 @@ class MembersView(APIView):
             users = serializer.validated_data['users']
             deleted, _ = chat.members.filter(user__in=users).delete()
             if deleted > 0:
+                # update
                 chat.save()
             return Response({
                 'ok': True
