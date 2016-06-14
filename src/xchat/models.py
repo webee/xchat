@@ -7,11 +7,13 @@ class ChatType:
     USER = "user"
     GROUP = "group"
     CS = "cs"
+    ROOM = "room"
 
 ChatTypeChoices = [
     (ChatType.SELF, "自聊"),
     (ChatType.USER, "单聊"),
     (ChatType.GROUP, "群聊"),
+    (ChatType.ROOM, "房间"),
     (ChatType.CS, "客服"),
 ]
 
