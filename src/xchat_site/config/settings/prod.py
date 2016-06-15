@@ -4,6 +4,7 @@ from utils.pmc_config import get_project_root, load_yaml, read_string
 
 proj_root = get_project_root()
 DEBUG = False
+ALLOWED_HOSTS = ['xchat.engdd.com']
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = read_string('conf/xchat/secret_key.txt', root=proj_root)
