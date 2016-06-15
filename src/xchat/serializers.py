@@ -35,6 +35,8 @@ class ChatSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("self chat must have and only have one member")
         if t == ChatType.USER and len(data['users']) != 2:
             raise serializers.ValidationError("user chat must have and only have two members")
+        if t == ChatType.CS and len(data['users']) != 1:
+            raise serializers.ValidationError("cs chat must have and only have one member")
 
         return data
 
@@ -51,6 +53,10 @@ class ChatSerializer(serializers.ModelSerializer):
         if t == ChatType.SELF:
             # 自聊唯一
             chat = Chat.objects.filter(type=ChatType.SELF).filter(members__user=users[0]).first()
+
+        if t == ChatType.CS:
+            # 客服唯一
+            chat = Chat.objects.filter(type=ChatType.CS).filter(members__user=users[0]).first()
 
         if chat is not None:
             chat.is_deleted = False
