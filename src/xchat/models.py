@@ -66,7 +66,7 @@ class RoomChat(models.Model):
         unique_together = (("room", "area"),)
 
     def __str__(self):
-        return "%s#%d#" % (self.room, self.area, self.chat)
+        return "%s#%d#%s" % (self.room, self.area, self.chat)
 
 
 class Member(models.Model):
