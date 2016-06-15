@@ -13,8 +13,8 @@ ChatTypeChoices = [
     (ChatType.SELF, "自聊"),
     (ChatType.USER, "单聊"),
     (ChatType.GROUP, "群聊"),
-    (ChatType.ROOM, "房间"),
     (ChatType.CS, "客服"),
+    (ChatType.ROOM, "房间")
 ]
 
 ChatTypes = {c[0] for c in ChatTypeChoices}
@@ -32,7 +32,7 @@ class Room(models.Model):
         verbose_name_plural = _("Rooms")
 
     def __str__(self):
-        return "room:%d" % (self.id,)
+        return "#%d:%s" % (self.id, self.title)
 
 
 class Chat(models.Model):
@@ -51,22 +51,22 @@ class Chat(models.Model):
         verbose_name_plural = _("Chats")
 
     def __str__(self):
-        return "%s:#%d:%s" % (self.type, self.id, self.tag)
+        return "%s#%d@%s" % (self.type, self.id, self.tag)
 
 
 class RoomChat(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="chats", null=True, editable=False)
-    seq = models.IntegerField(default=0)
+    area = models.IntegerField(default=0)
     chat = models.OneToOneField(Chat)
 
     class Meta:
         verbose_name = _("RoomChat")
         verbose_name_plural = _("RoomChats")
 
-        unique_together = (('room', 'seq'),)
+        unique_together = (("room", "area"),)
 
     def __str__(self):
-        return "%s#%d->%s" % (self.room, self.seq, self.chat)
+        return "%s#%d#" % (self.room, self.area, self.chat)
 
 
 class Member(models.Model):
