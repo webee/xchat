@@ -33,7 +33,7 @@ class UserChatsView(APIView):
             members = members.filter(chat__type=t)
         if tag:
             members = members.filter(chat__tag=tag)
-        return Response([{"id": m.chat.id, "type": m.chat.type, "title": m.chat.title, "tag": m.chat.tag, 'msg_id': m.chat.msg_id} for m in members])
+        return Response([{"id": m.chat.chat_id, "type": m.chat.type, "title": m.chat.title, "tag": m.chat.tag, 'msg_id': m.chat.msg_id} for m in members])
 
 
 class CreateChatView(APIView):
@@ -44,7 +44,7 @@ class CreateChatView(APIView):
         if serializer.is_valid():
             try:
                 chat = serializer.save()
-                return Response({"id": chat.id}, status=status.HTTP_201_CREATED)
+                return Response({"id": chat.chat_id}, status=status.HTTP_201_CREATED)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -55,6 +55,7 @@ class ChatView(APIView):
     get, search chats.
     """
     def get_queryset(self, chat_id):
+        chat_id = int(chat_id.split('.', 1)[1])
         return Chat.objects.filter(id=chat_id, is_deleted=False)
 
     def get_chat(self, chat_id):
@@ -79,6 +80,7 @@ class MembersView(APIView):
     get, add, remove chat members.
     """
     def get_chat(self, chat_id):
+        chat_id = int(chat_id.split('.', 1)[1])
         try:
             return Chat.objects.get(id=chat_id, is_deleted=False)
         except Chat.DoesNotExist:

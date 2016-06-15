@@ -6,11 +6,11 @@ from .models import Chat, Member, ChatTypes, ChatType
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ('user', 'cur_id', 'created')
+        fields = ('user', 'cur_id', 'joined')
 
 
 class ChatSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField()
+    id = serializers.ReadOnlyField(source="chat_id")
     msg_id = serializers.ReadOnlyField()
     is_deleted = serializers.ReadOnlyField()
     users = serializers.ListField(required=False, write_only=True,

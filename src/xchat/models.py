@@ -46,6 +46,10 @@ class Chat(models.Model):
     # 添加成员之后需要更新这里
     updated = models.DateTimeField(auto_now=True, editable=False)
 
+    @property
+    def chat_id(self):
+        return "%s.%d" % (self.type, self.id)
+
     class Meta:
         verbose_name = _("Chat")
         verbose_name_plural = _("Chats")
