@@ -8,7 +8,7 @@ ALLOWED_HOSTS = ['xchat.engdd.com']
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = read_string('conf/xchat/secret_key.txt', root=proj_root)
-USER_KEY = '81QD19JX0N3XH07DJQFVTCGLDD8X5UGF'
+USER_KEY = read_string('conf/xchat/user_key.txt', root=proj_root)
 
 
 DATABASES = load_yaml('conf/xchat/databases.yaml', root=proj_root)
