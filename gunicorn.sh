@@ -14,7 +14,7 @@ source ${VENV_DIR}/bin/activate
 export PYTHONPATH=${SRC_DIR}:${PYTHONPATH}
 export ENV=${env}
 
-exec gunicorn -c ${PROJ_ROOT}/deploy/gunicorn.conf.py -b 127.0.0.1:${port} \
+exec gunicorn -c ${PROJ_ROOT}/deploy/gunicorn.conf.py -b 0.0.0.0:${port} \
   --name ${NAME} \
   -k gevent \
   -w ${NUM_WORKERS} \
