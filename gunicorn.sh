@@ -20,7 +20,7 @@ exec gunicorn -c ${PROJ_ROOT}/deploy/gunicorn.conf.py -b 0.0.0.0:${port} \
   -w ${NUM_WORKERS} \
   --max-requests 10240 \
   --max-requests-jitter 100 \
-  --access-logformat '%(h)s %(l)s %(u)s %(t)s {Host}i "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+  --access-logformat '%(h)s %(l)s %(u)s %(t)s {Host}i "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"' \
   --access-logfile ${PROJ_ROOT}/logs/access.log \
   --error-logfile ${PROJ_ROOT}/logs/error.log \
   --log-level warning \
