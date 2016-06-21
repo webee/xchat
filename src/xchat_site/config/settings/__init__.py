@@ -20,19 +20,19 @@ src_root = os.path.join(proj_root, 'src')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = proj_root
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '4w6%)y_=gz3t_52bw5qwh6ms34^t&p4e7z+=k3q14j2-0xvyz$'
 USER_KEY = 'demo app user key.'
+TEST_USER_KEY = 'demo app user key.'
+CS_USER_KEY = 'demo app user key.'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -79,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'xchat_site.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
@@ -93,7 +92,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -113,7 +111,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
@@ -127,13 +124,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_ROOT = os.path.join(proj_root, 'static')
 STATIC_URL = '/static/'
-
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -147,7 +142,7 @@ REST_FRAMEWORK = {
 }
 
 JWT_AUTH = {
-    'JWT_SECRET_KEY': USER_KEY,
+    'JWT_SECRET_KEY': {'': USER_KEY, 'test': TEST_USER_KEY, 'cs': CS_USER_KEY},
     'JWT_ALGORITHM': 'HS256',
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
@@ -155,13 +150,13 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=36),
     'JWT_AUDIENCE': None,
     'JWT_ISSUER': None,
+    'JWT_DECODE_HANDLER': 'xchat.authentication.jwt_decode_handler',
 
     'JWT_ALLOW_REFRESH': False,
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(hours=23),
 
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
-
 
 LOGGING = {
     'version': 1,

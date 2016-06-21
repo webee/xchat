@@ -8,6 +8,7 @@ from django.http.response import JsonResponse
 import time
 from .models import Chat, ChatType, Member
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
+from xchat.authentication import encode_ns_user
 
 
 def test(request):
@@ -43,7 +44,7 @@ class CreateChatView(APIView):
         serializer = ChatSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                chat = serializer.save()
+                chat = serializer.save(ns=request.user.ns)
                 return Response({"id": chat.chat_id}, status=status.HTTP_201_CREATED)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -97,7 +98,7 @@ class MembersView(APIView):
             return Response({'ok': False}, status=status.HTTP_403_FORBIDDEN)
         serializer = MembersSerializer(data=request.data)
         if serializer.is_valid():
-            _ = serializer.save(chat=chat)
+            _ = serializer.save(ns=request.user.ns, chat=chat)
             return Response({
                 'ok': True
             }, status=status.HTTP_201_CREATED)
@@ -110,7 +111,9 @@ class MembersView(APIView):
 
         serializer = MembersSerializer(data=request.data)
         if serializer.is_valid():
+            ns = request.user.ns
             users = serializer.validated_data['users']
+            users = [encode_ns_user(ns, user) for user in users]
             deleted, _ = chat.members.filter(user__in=users).delete()
             if deleted > 0:
                 # update

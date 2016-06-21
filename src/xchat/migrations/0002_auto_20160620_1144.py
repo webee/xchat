@@ -10,8 +10,8 @@ def add_init_chats(apps, schema_editor):
 
     c = Chat(type='group', title='测试', tag='test')
     c.save()
-    c.members.create(user='test')
-    c.members.create(user='webee')
+    c.members.create(user='test:test')
+    c.members.create(user='test:webee')
 
 
 def add_qq_grd_room(apps, schema_editor):

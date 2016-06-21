@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
+from xchat.authentication import encode_ns_user
 from .models import Chat, Member, ChatTypes, ChatType
 
 
@@ -42,8 +43,9 @@ class ChatSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        ns = validated_data['ns']
         t = validated_data['type']
-        users = validated_data['users']
+        users = [encode_ns_user(ns, user) for user in validated_data['users']]
 
         chat = None
         if t == ChatType.USER:
@@ -81,8 +83,9 @@ class MembersSerializer(serializers.Serializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        ns = validated_data['ns']
         chat = validated_data['chat']
-        users = validated_data['users']
+        users = [encode_ns_user(ns, user) for user in validated_data['users']]
 
         for user in users:
             Member.objects.get_or_create(chat=chat, user=user, cur_id=chat.msg_id)
