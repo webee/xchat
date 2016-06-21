@@ -23,7 +23,7 @@ def parse_ns_token(token):
 
 
 def jwt_decode_handler(token):
-    ns, token = parse_ns_token(token)
+    ns, token = parse_ns_token(token.decode())
     options = {
         'verify_exp': api_settings.JWT_VERIFY_EXPIRATION,
     }
@@ -61,7 +61,7 @@ class VirtualUser(object):
 class JWTAuthentication(JSONWebTokenAuthentication):
     def get_jwt_value(self, request):
         jwt = super(JWTAuthentication, self).get_jwt_value(request)
-        return jwt or request.query_params.get('jwt')
+        return jwt or request.query_params.get('jwt').encode()
 
     def authenticate_credentials(self, payload):
         is_admin = payload.get("is_admin", False)
