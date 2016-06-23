@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.http.response import JsonResponse
 import time
-from .models import Chat, ChatType, Member
+from .models import Chat, ChatType, Member, Room
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 from xchat.authentication import encode_ns_user
 
@@ -74,6 +74,22 @@ class ChatView(APIView):
     def delete(self, request, chat_id):
         _ = self.get_queryset(chat_id).update(is_deleted=True)
         return Response({'ok': True})
+
+
+class RoomChatsView(APIView):
+    """
+    get, search rooms.
+    """
+    def get_room(self, room_id):
+        try:
+            return Room.objects.get(pk=room_id)
+        except Room.DoesNotExist:
+            raise Http404
+
+    def get(self, request, room_id):
+        room = self.get_room(room_id)
+        chats = [chat.chat.chat_id for chat in room.chats.select_related().order_by('area').all()]
+        return Response(chats)
 
 
 class MembersView(APIView):
