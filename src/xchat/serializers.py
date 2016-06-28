@@ -19,7 +19,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('id', 'type', 'users', 'title', 'tag', 'msg_id', 'is_deleted', 'created')
+        fields = ('id', 'type', 'users', 'title', 'tag', 'msg_id', 'ext', 'is_deleted', 'created')
 
     def validate_type(self, value):
         if value not in ChatTypes:
@@ -67,7 +67,8 @@ class ChatSerializer(serializers.ModelSerializer):
 
         tag = validated_data.get('tag', '')
         title = validated_data.get('title', '')
-        chat = Chat(type=t, tag=tag, title=title)
+        ext = validated_data.get('ext', '')
+        chat = Chat(type=t, tag=tag, title=title, ext=ext)
         chat.save()
 
         for user in users:

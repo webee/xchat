@@ -34,7 +34,7 @@ class UserChatsView(APIView):
             members = members.filter(chat__type=t)
         if tag:
             members = members.filter(chat__tag=tag)
-        return Response([{"id": m.chat.chat_id, "type": m.chat.type, "title": m.chat.title, "tag": m.chat.tag, 'msg_id': m.chat.msg_id} for m in members])
+        return Response([{"id": m.chat.chat_id, "type": m.chat.type, "title": m.chat.title, "tag": m.chat.tag, 'msg_id': m.chat.msg_id, 'ext': m.chat.ext} for m in members])
 
 
 class CreateChatView(APIView):

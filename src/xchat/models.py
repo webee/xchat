@@ -40,6 +40,7 @@ class Chat(models.Model):
     title = models.CharField(max_length=64, null=True, default="", blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
     msg_id = models.BigIntegerField(default=0)
+    ext = models.TextField(default="")
 
     is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
