@@ -57,7 +57,8 @@ class ChatSerializer(serializers.ModelSerializer):
             chat = Chat.objects.filter(type=ChatType.SELF).filter(members__user=users[0]).first()
 
         if t == ChatType.CS:
-            # 客服唯一
+            # TODO: 客服通过tag区别不通的客服团队
+            # 同一tag的user客服唯一
             chat = Chat.objects.filter(type=ChatType.CS).filter(members__user=users[0]).first()
 
         if chat is not None:
