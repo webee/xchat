@@ -1,4 +1,4 @@
-from django.db import transaction, models
+from django.db import transaction
 from django.http import Http404
 from rest_framework import status
 from rest_framework.views import APIView
@@ -6,13 +6,39 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.http.response import JsonResponse
 import time
+import json
 from .models import Chat, ChatType, Member, Room
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 from xchat.authentication import encode_ns_user
 
 
 def test(request):
-    return JsonResponse({'ok': True, 't': time.time()})
+    params = request.GET
+    res = {'st': time.time()}
+    sleep = params.get("sleep")
+    if sleep:
+        time.sleep(float(sleep))
+
+    ok = params.get("not_ok") is None
+
+    res['ok'] = ok
+    if not ok:
+        code = params.get("code")
+        error = params.get("error")
+        if code is not None:
+            res["code"] = int(code)
+        if error is not None:
+            res["error"] = error
+    else:
+        data = params.get("data")
+        if data is not None:
+            try:
+                res["data"] = json.loads(data)
+            except json.JSONDecodeError:
+                res["data"] = data
+
+    res['et'] = time.time()
+    return JsonResponse(res)
 
 
 class TestView(APIView):
