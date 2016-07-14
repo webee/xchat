@@ -15,6 +15,7 @@ from xchat.authentication import encode_ns_user
 def test(request):
     params = request.GET
     res = {'st': time.time()}
+    status = int(params.get("status", 200))
     sleep = params.get("sleep")
     if sleep:
         time.sleep(float(sleep))
@@ -38,7 +39,7 @@ def test(request):
                 res["data"] = data
 
     res['et'] = time.time()
-    return JsonResponse(res)
+    return JsonResponse(res, status=status)
 
 
 class TestView(APIView):
