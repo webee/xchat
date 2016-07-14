@@ -19,7 +19,7 @@ def test(request):
     if sleep:
         time.sleep(float(sleep))
 
-    ok = params.get("not_ok") is None
+    ok = params.get("not_ok") is None or not params.get("not_ok") == "false"
 
     res['ok'] = ok
     if not ok:
