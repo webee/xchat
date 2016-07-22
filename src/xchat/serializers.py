@@ -90,7 +90,11 @@ class MembersSerializer(serializers.Serializer):
         users = [encode_ns_user(ns, user) for user in validated_data['users']]
 
         for user in users:
-            Member.objects.get_or_create(chat=chat, user=user, cur_id=chat.msg_id)
+            member, _ = Member.objects.get_or_create(chat=chat, user=user)
+            member.cur_id = chat.msg_id
+            member.exit_msg_id = 0
+            member.is_exited = False
+            member.save()
         # update
         chat.save()
         return True

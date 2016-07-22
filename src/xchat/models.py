@@ -80,6 +80,8 @@ class Member(models.Model):
 
     joined = models.DateTimeField(auto_now_add=True, editable=False)
     cur_id = models.BigIntegerField(default=0)
+    exit_msg_id = models.BigIntegerField(default=0)
+    is_exited = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("Member")
