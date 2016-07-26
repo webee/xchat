@@ -7,7 +7,7 @@ from .models import Chat, Member, ChatTypes, ChatType
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ('user', 'cur_id', 'joined')
+        fields = ('user', 'cur_id', 'joined', 'is_exited', 'exit_msg_id')
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -36,6 +36,8 @@ class ChatSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("self chat must have and only have one member")
         if t == ChatType.USER and len(data['users']) != 2:
             raise serializers.ValidationError("user chat must have and only have two members")
+        if t == ChatType.USERS and len(data['users']) < 2:
+            raise serializers.ValidationError("users chat must have more than two members")
         if t == ChatType.CS and len(data['users']) != 1:
             raise serializers.ValidationError("cs chat must have and only have one member")
 

@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 class ChatType:
     SELF = "self"
     USER = "user"
+    USERS = "users"
     GROUP = "group"
     CS = "cs"
     ROOM = "room"
@@ -12,7 +13,8 @@ class ChatType:
 ChatTypeChoices = [
     (ChatType.SELF, "自聊"),
     (ChatType.USER, "单聊"),
-    (ChatType.GROUP, "群聊"),
+    (ChatType.USERS, "讨论组"),
+    (ChatType.GROUP, "群组"),
     (ChatType.CS, "客服"),
     (ChatType.ROOM, "房间")
 ]

@@ -137,7 +137,8 @@ class MembersView(APIView):
 
     def post(self, request, chat_id, format=None):
         chat = self.get_chat(chat_id)
-        if chat.type in [ChatType.SELF, ChatType.USER]:
+        # 只能给群组会话增加成员
+        if chat.type not in [ChatType.GROUP]:
             return Response({'ok': False}, status=status.HTTP_403_FORBIDDEN)
         serializer = MembersSerializer(data=request.data)
         if serializer.is_valid():
@@ -149,7 +150,8 @@ class MembersView(APIView):
 
     def delete(self, request, chat_id, format=None):
         chat = self.get_chat(chat_id)
-        if chat.type in [ChatType.SELF, ChatType.USER]:
+        # 只能从群组会话删除成员
+        if chat.type not in [ChatType.GROUP]:
             return Response({'ok': False}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = MembersSerializer(data=request.data)
@@ -157,6 +159,7 @@ class MembersView(APIView):
             ns = request.user.ns
             users = serializer.validated_data['users']
             users = [encode_ns_user(ns, user) for user in users]
+            # TODO: 标记is_exited.
             deleted, _ = chat.members.filter(user__in=users).delete()
             if deleted > 0:
                 # update
