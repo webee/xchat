@@ -17,13 +17,13 @@ class Migration(migrations.Migration):
             name='exit_msg_id',
             field=models.BigIntegerField(default=0),
         ),
-        migrations.RunSQL('alter table xchat_member alter exit_msg_id set default 0'),
+        migrations.RunSQL('alter table xchat_member alter exit_msg_id set default 0', reverse_sql=''),
         migrations.AddField(
             model_name='member',
             name='is_exited',
             field=models.BooleanField(default=False),
         ),
-        migrations.RunSQL('alter table xchat_member alter is_exited set default false'),
+        migrations.RunSQL('alter table xchat_member alter is_exited set default false', reverse_sql=''),
         migrations.AlterField(
             model_name='chat',
             name='ext',
