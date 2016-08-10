@@ -84,6 +84,8 @@ class Member(models.Model):
     cur_id = models.BigIntegerField(default=0)
     exit_msg_id = models.BigIntegerField(default=0)
     is_exited = models.BooleanField(default=False)
+    # Do Not Disturb
+    dnd = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("Member")

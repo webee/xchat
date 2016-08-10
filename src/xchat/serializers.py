@@ -7,7 +7,7 @@ from .models import Chat, Member, ChatTypes, ChatType
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ('user', 'cur_id', 'joined', 'is_exited', 'exit_msg_id')
+        fields = ('user', 'cur_id', 'joined', 'is_exited', 'exit_msg_id', 'dnd')
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -96,6 +96,7 @@ class MembersSerializer(serializers.Serializer):
             member.cur_id = chat.msg_id
             member.exit_msg_id = 0
             member.is_exited = False
+            member.dnd = False
             member.save()
         # update
         chat.save()
