@@ -35,7 +35,10 @@ class ChatSerializer(serializers.ModelSerializer):
         if t == ChatType.SELF and len(data['users']) != 1:
             raise serializers.ValidationError("self chat must have and only have one member")
         if t == ChatType.USER and len(data['users']) != 2:
-            raise serializers.ValidationError("user chat must have and only have two members")
+            if len(data['users']) == 1:
+                data['type'] = ChatType.SELF
+            else:
+                raise serializers.ValidationError("user chat must have and only have two members")
         if t == ChatType.USERS and len(data['users']) < 2:
             raise serializers.ValidationError("users chat must have more than two members")
         if t == ChatType.CS and len(data['users']) != 1:
