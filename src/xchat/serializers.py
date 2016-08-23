@@ -68,7 +68,8 @@ class ChatSerializer(serializers.ModelSerializer):
 
         if chat is not None:
             chat.is_deleted = False
-            chat.save()
+            # update
+            chat.update_updated(fields=['is_deleted'])
             return chat
 
         tag = validated_data.get('tag', '')
@@ -102,5 +103,5 @@ class MembersSerializer(serializers.Serializer):
             member.dnd = False
             member.save()
         # update
-        chat.save()
+        chat.update_updated()
         return True

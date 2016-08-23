@@ -163,7 +163,7 @@ class MembersView(APIView):
             deleted, _ = chat.members.filter(user__in=users).delete()
             if deleted > 0:
                 # update
-                chat.save()
+                chat.update_updated()
             return Response({
                 'ok': True
             }, status=status.HTTP_200_OK)

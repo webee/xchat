@@ -10,6 +10,7 @@ class ChatType:
     CS = "cs"
     ROOM = "room"
 
+
 ChatTypeChoices = [
     (ChatType.SELF, "自聊"),
     (ChatType.USER, "单聊"),
@@ -48,6 +49,9 @@ class Chat(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     # 添加成员之后需要更新这里
     updated = models.DateTimeField(auto_now=True, editable=False)
+
+    def update_updated(self, fields=None):
+        self.save(update_fields=['updated'] + (fields if not fields else []))
 
     @property
     def chat_id(self):
