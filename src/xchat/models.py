@@ -51,7 +51,7 @@ class Chat(models.Model):
     updated = models.DateTimeField(auto_now=True, editable=False)
 
     def update_updated(self, fields=None):
-        self.save(update_fields=['updated'] + (fields if not fields else []))
+        self.save(update_fields=['updated'] + (fields if fields else []))
 
     @property
     def chat_id(self):
