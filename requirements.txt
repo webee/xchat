@@ -8,3 +8,4 @@ psycopg2==2.6.1
 gunicorn==19.6.0
 gevent==1.1.1
 PyYAML==3.10
+#psycogreen==1.0
