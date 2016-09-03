@@ -7,7 +7,7 @@ from ._utils import gen_token
 
 
 class Command(BaseCommand):
-    help = "test command"
+    help = "send <kind> <message> of <domain> to a <chat> as an <user>, [check] or [not check] user permissions."
 
     def add_arguments(self, parser):
         # Positional arguments
@@ -18,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument('-user', type=str, dest='user', required=True, help='the sender')
         parser.add_argument('-kind', type=str, dest='kind', default="chat", help='the msg kind, default is chat msg')
         parser.add_argument('-domain', type=str, dest='domain', default="", help='the domain, default to ignore it')
-        parser.add_argument('-perm_check', action='store_true', dest='perm_check', default=False, help='whether to check user permission')
+        parser.add_argument('-perm_check', action='store_true', dest='perm_check', default=False, help='whether to check user permissions')
 
     def handle(self, *args, **options):
         chat_id = options['chat_id']
