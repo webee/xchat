@@ -9,3 +9,4 @@ gunicorn==19.6.0
 gevent==1.1.1
 PyYAML==3.10
 #psycogreen==1.0
+requests==2.10.0

@@ -8,6 +8,12 @@ def encode_ns_user(ns, user):
     return user
 
 
+def encode_ns_token(ns, token):
+    if ns:
+        return ns + ':' + token
+    return token
+
+
 def decode_ns_user(user):
     parts = user.split(':', 1)
     if len(parts) == 1:

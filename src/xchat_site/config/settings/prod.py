@@ -6,11 +6,13 @@ proj_root = get_project_root()
 DEBUG = False
 ALLOWED_HOSTS = ['xchat.qinqinwojia.cn', 'l-xchat2.x.nc2.qq.com']
 
+XCHAT_API_ROOT_URL = 'http://xchat.qinqinwojia.cn'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = read_string('conf/xchat/secret_key.txt', root=proj_root)
 USER_KEY = read_string('conf/xchat/user_key.txt', root=proj_root)
 TEST_USER_KEY = read_string('conf/xchat/test_user_key.txt', root=proj_root)
 CS_USER_KEY = read_string('conf/xchat/cs_user_key.txt', root=proj_root)
+NS_USER_KEYS = {'': USER_KEY, 'test': TEST_USER_KEY, 'cs': CS_USER_KEY}
 
 
 DATABASES = load_yaml('conf/xchat/databases.yaml', root=proj_root)
@@ -24,7 +26,7 @@ STATIC_URL = '/static/'
 
 
 JWT_AUTH = {
-    'JWT_SECRET_KEY': {'': USER_KEY, 'test': TEST_USER_KEY, 'cs': CS_USER_KEY},
+    'JWT_SECRET_KEY': NS_USER_KEYS,
     'JWT_ALGORITHM': 'HS256',
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
