@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from django.conf import settings
-from xchat.authentication import decode_ns_user, encode_ns_token
+from xchat.authentication import encode_ns_token
 import jwt
 
 
