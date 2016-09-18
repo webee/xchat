@@ -7,4 +7,5 @@ test/
 *.pid
 
 local_settings.py
+logs/
 *.log
