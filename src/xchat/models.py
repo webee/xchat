@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.datetime_safe import datetime
 
 
 class ChatType:
@@ -39,10 +40,13 @@ class Room(models.Model):
 
 
 class Chat(models.Model):
-    type = models.CharField(max_length=10, choices=ChatTypeChoices)
+    type = models.CharField(max_length=10, choices=ChatTypeChoices, editable=False)
     title = models.CharField(max_length=64, null=True, default="", blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
-    msg_id = models.BigIntegerField(default=0)
+    # 最后消息id, 消息id是针对每个会话的
+    msg_id = models.BigIntegerField(editable=False, default=0)
+    # 最后消息时间, 针对所有会话, 检查是否有更新
+    last_msg_ts = models.DateTimeField(editable=False, default=datetime(1970, 1,1))
     ext = models.TextField(default="", blank=True)
 
     is_deleted = models.BooleanField(default=False)
