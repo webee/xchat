@@ -12,6 +12,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
 class ChatSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source="chat_id")
+    type = serializers.CharField(allow_blank=False, max_length=10)
     msg_id = serializers.ReadOnlyField()
     is_deleted = serializers.ReadOnlyField()
     users = serializers.ListField(required=False, write_only=True,
