@@ -89,8 +89,12 @@ class Member(models.Model):
     user = models.CharField(max_length=32, null=False, db_index=True)
 
     joined = models.DateTimeField(auto_now_add=True, editable=False)
-    cur_id = models.BigIntegerField(default=0)
-    exit_msg_id = models.BigIntegerField(default=0)
+    # 加入时的消息id
+    join_msg_id = models.BigIntegerField(default=0, editable=False)
+    # 当前同步的消息id
+    cur_id = models.BigIntegerField(default=0, editable=False)
+    # 离开时的消息id
+    exit_msg_id = models.BigIntegerField(default=0, editable=False)
     is_exited = models.BooleanField(default=False)
     # Do Not Disturb
     dnd = models.BooleanField(default=False)

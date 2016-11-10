@@ -83,7 +83,7 @@ class ChatSerializer(serializers.ModelSerializer):
         chat.save()
 
         for user in users:
-            Member.objects.get_or_create(chat=chat, user=user)
+            member, _ = Member.objects.get_or_create(chat=chat, user=user)
         return chat
 
 
@@ -100,9 +100,9 @@ class MembersSerializer(serializers.Serializer):
         users = [encode_ns_user(ns, user) for user in validated_data['users']]
 
         for user in users:
-            member, _ = Member.objects.get_or_create(chat=chat, user=user)
+            member, created = Member.objects.get_or_create(chat=chat, user=user)
             member.cur_id = chat.msg_id
-            member.exit_msg_id = 0
+            member.join_msg_id = chat.msg_id
             member.is_exited = False
             member.dnd = False
             member.save()
