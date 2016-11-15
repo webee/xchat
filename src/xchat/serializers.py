@@ -44,6 +44,8 @@ class ChatSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("users chat must have more than two members")
         if t == ChatType.CS and len(data['users']) != 1:
             raise serializers.ValidationError("cs chat must have and only have one member")
+        if t not in [ChatType.SELF, ChatType.USER, ChatType.USERS] and data['tag'] == "user":
+            raise serializers.ValidationError("tag 'user' is reserved for user created chats")
 
         return data
 
