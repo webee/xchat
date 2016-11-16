@@ -42,7 +42,7 @@ class Room(models.Model):
 class Chat(models.Model):
     type = models.CharField(max_length=10, choices=ChatTypeChoices, editable=False)
     title = models.CharField(max_length=64, null=True, default="", blank=True)
-    tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
+    tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True, editable=False)
     # 最后消息id, 消息id是针对每个会话的
     msg_id = models.BigIntegerField(editable=False, default=0)
     # 最后消息时间, 针对所有会话, 检查是否有更新

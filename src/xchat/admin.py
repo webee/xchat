@@ -10,6 +10,7 @@ class RoomChatInline(admin.TabularInline):
 class RoomAdmin(admin.ModelAdmin):
     inlines = (RoomChatInline,)
     search_fields = ['id', 'title', 'tag']
+    readonly_fields = ['id', 'created']
     list_display = ('id', 'title', 'tag', 'is_deleted', 'created')
 
 
@@ -22,6 +23,7 @@ class ChatAdmin(admin.ModelAdmin):
     inlines = (MemberInline,)
     list_filter = ['type', 'tag']
     search_fields = ['id', 'title', 'tag']
+    readonly_fields = ['id', 'type', 'tag', 'msg_id', 'last_msg_ts', 'created', 'updated']
     list_display = ('id', 'type', 'title', 'tag', 'msg_id', 'last_msg_ts', 'is_deleted', 'updated', 'created')
 
 
