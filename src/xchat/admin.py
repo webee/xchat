@@ -5,6 +5,7 @@ from django.contrib import admin
 class RoomChatInline(admin.TabularInline):
     model = RoomChat
     extra = 1
+    readonly_fields = ['id']
 
 
 class RoomAdmin(admin.ModelAdmin):
@@ -17,6 +18,7 @@ class RoomAdmin(admin.ModelAdmin):
 class MemberInline(admin.TabularInline):
     model = Member
     extra = 1
+    readonly_fields = ['id', 'joined', 'join_msg_id', 'cur_id', 'exit_msg_id']
 
 
 class ChatAdmin(admin.ModelAdmin):
