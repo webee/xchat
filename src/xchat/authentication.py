@@ -67,7 +67,7 @@ class VirtualUser(object):
 class JWTAuthentication(JSONWebTokenAuthentication):
     def get_jwt_value(self, request):
         jwt = super(JWTAuthentication, self).get_jwt_value(request)
-        return jwt or request.query_params.get('jwt').encode()
+        return jwt or request.query_params.get('jwt', '').encode()
 
     def authenticate_credentials(self, payload):
         is_admin = payload.get("is_admin", False)
