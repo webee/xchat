@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
 from . import views
+from . import stat_views
 
 urlpatterns = [
     url(r'^t/$', views.test),
@@ -11,4 +12,7 @@ urlpatterns = [
     url(r'^chats/$', views.CreateChatView.as_view(), name='create-chat'),
     url(r'^user/chats/$', views.UserChatsView.as_view(), name='user-chats'),
     url(r'^rooms/(?P<room_id>\d+)/chats/$', views.RoomChatsView.as_view(), name='room-chats'),
+
+    # stats
+    url(r'^stat/chat/user/msgs/$', stat_views.StatChatUserMsgsView.as_view(), name='stat-chat-user-msgs'),
 ]
