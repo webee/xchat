@@ -17,6 +17,7 @@ class Migration(migrations.Migration):
             name='join_msg_id',
             field=models.BigIntegerField(default=0, editable=False),
         ),
+        migrations.RunSQL('alter table xchat_member alter join_msg_id set default 0', reverse_sql=''),
         migrations.AlterField(
             model_name='chat',
             name='msg_id',
