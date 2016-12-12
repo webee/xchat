@@ -41,8 +41,11 @@ class ChatSerializer(serializers.ModelSerializer):
                 data['type'] = ChatType.SELF
             else:
                 raise serializers.ValidationError("user chat must have and only have two members")
-        if t == ChatType.USERS and len(data['users']) < 2:
-            raise serializers.ValidationError("users chat must have more than two members")
+        if t == ChatType.USERS:
+            if len(data['users']) < 2:
+                raise serializers.ValidationError("users chat must have more than 1 members")
+            elif len(data['users']) >= 100:
+                raise serializers.ValidationError("users chat must have less than 100 members")
         if t == ChatType.CS and len(data['users']) != 1:
             raise serializers.ValidationError("cs chat must have and only have one member")
         if t not in [ChatType.SELF, ChatType.USER, ChatType.USERS] and data.get('tag') == "user":
@@ -112,6 +115,7 @@ class MembersSerializer(serializers.Serializer):
                 member.is_exited = False
                 member.dnd = False
                 member.save()
+
         # update
         if do_updated:
             chat.update_updated()

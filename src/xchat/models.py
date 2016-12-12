@@ -40,6 +40,8 @@ class Room(models.Model):
 
 
 class Chat(models.Model):
+    # self, user会话成员以字典序用$分割的字符串, 用来唯一表示一个会话
+    # key = models.CharField(max_length=64, null=True, unique=True, editable=False)
     type = models.CharField(max_length=10, choices=ChatTypeChoices, editable=False)
     title = models.CharField(max_length=64, null=True, default="", blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True, editable=False)
@@ -98,6 +100,13 @@ class Member(models.Model):
     is_exited = models.BooleanField(default=False)
     # Do Not Disturb
     dnd = models.BooleanField(default=False)
+
+    # TODO: 用于客户端同步我的会话信息
+    # 修改成员信息时需要更新这里
+    # updated = models.DateTimeField(auto_now=True, editable=False)
+
+    #def update_updated(self, fields=None):
+    #    self.save(update_fields=['updated'] + (fields if fields else []))
 
     class Meta:
         verbose_name = _("Member")
