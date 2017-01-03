@@ -39,7 +39,8 @@ class Room(models.Model):
     def max_area(self):
         res = self.chats.aggregate(Max('area'))
         if res:
-            return res['area__max']
+            area_max = res['area__max']
+            return area_max if area_max is not None else -1
         return -1
 
     def __str__(self):
