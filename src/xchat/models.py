@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datetime_safe import datetime
 
@@ -35,6 +36,12 @@ class Room(models.Model):
         verbose_name = _("Room")
         verbose_name_plural = _("Rooms")
 
+    def max_area(self):
+        res = self.chats.aggregate(Max('area'))
+        if res:
+            return res['area__max']
+        return -1
+
     def __str__(self):
         return "#%d:%s" % (self.id, self.title)
 
@@ -42,9 +49,9 @@ class Room(models.Model):
 class Chat(models.Model):
     # self, user会话成员以字典序用$分割的字符串, 用来唯一表示一个会话
     # key = models.CharField(max_length=64, null=True, unique=True, editable=False)
-    type = models.CharField(max_length=10, choices=ChatTypeChoices, editable=False)
+    type = models.CharField(max_length=10, choices=ChatTypeChoices)
     title = models.CharField(max_length=64, null=True, default="", blank=True)
-    tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True, editable=False)
+    tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
     # 最后消息id, 消息id是针对每个会话的
     msg_id = models.BigIntegerField(editable=False, default=0)
     # 最后消息时间, 针对所有会话, 检查是否有更新
