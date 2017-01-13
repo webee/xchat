@@ -5,7 +5,6 @@ from django.utils.datetime_safe import datetime
 
 
 class ChatType:
-    XCHAT = "_xchat"  # 系统会话
     SELF = "self"
     USER = "user"
     USERS = "users"
@@ -15,7 +14,6 @@ class ChatType:
 
 
 ChatTypeChoices = [
-    (ChatType.XCHAT, "_XCHAT"),  # 系统会话
     (ChatType.SELF, "自聊"),
     (ChatType.USER, "单聊"),
     (ChatType.USERS, "讨论组"),

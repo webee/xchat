@@ -34,8 +34,6 @@ class ChatSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         t = data['type']
-        if t == ChatType.XCHAT and len(data['users']) != 1:
-            raise serializers.ValidationError("_xchat chat must have and only have one member")
         if t == ChatType.SELF and len(data['users']) != 1:
             raise serializers.ValidationError("self chat must have and only have one member")
         if t == ChatType.USER and len(data['users']) != 2:
@@ -52,8 +50,6 @@ class ChatSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("cs chat must have and only have one member")
         if t not in [ChatType.SELF, ChatType.USER, ChatType.USERS] and data.get('tag') == "user":
             raise serializers.ValidationError("tag 'user' is reserved for user created chats")
-        if t != ChatType.XCHAT and data.get('tag') == "_xchat":
-            raise serializers.ValidationError("tag '_xchat' is reserved for _xchat chats")
 
         return data
 
@@ -71,10 +67,6 @@ class ChatSerializer(serializers.ModelSerializer):
         if t == ChatType.SELF:
             # 自聊唯一
             chat = Chat.objects.filter(type=ChatType.SELF).filter(members__user=users[0]).first()
-
-        if t == ChatType.XCHAT:
-            # 系统会话唯一
-            chat = Chat.objects.filter(type=ChatType.XCHAT).filter(members__user=users[0]).first()
 
         if t == ChatType.CS:
             # TODO: 客服通过tag区别不同的客服团队
