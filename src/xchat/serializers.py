@@ -34,6 +34,8 @@ class ChatSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         t = data['type']
+        if t == ChatType.XCHAT and len(data['users']) != 1:
+            raise serializers.ValidationError("_xchat chat must have and only have one member")
         if t == ChatType.SELF and len(data['users']) != 1:
             raise serializers.ValidationError("self chat must have and only have one member")
         if t == ChatType.USER and len(data['users']) != 2:
@@ -50,6 +52,8 @@ class ChatSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("cs chat must have and only have one member")
         if t not in [ChatType.SELF, ChatType.USER, ChatType.USERS] and data.get('tag') == "user":
             raise serializers.ValidationError("tag 'user' is reserved for user created chats")
+        if t != ChatType.XCHAT and data.get('tag') == "_xchat":
+            raise serializers.ValidationError("tag '_xchat' is reserved for _xchat chats")
 
         return data
 
@@ -68,6 +72,10 @@ class ChatSerializer(serializers.ModelSerializer):
             # 自聊唯一
             chat = Chat.objects.filter(type=ChatType.SELF).filter(members__user=users[0]).first()
 
+        if t == ChatType.XCHAT:
+            # 系统会话唯一
+            chat = Chat.objects.filter(type=ChatType.XCHAT).filter(members__user=users[0]).first()
+
         if t == ChatType.CS:
             # TODO: 客服通过tag区别不同的客服团队
             # 同一tag的user客服唯一
@@ -76,7 +84,7 @@ class ChatSerializer(serializers.ModelSerializer):
         if chat is not None:
             chat.is_deleted = False
             # update
-            chat.update_updated(fields=['is_deleted'])
+            chat.update_members_updated(fields=['is_deleted'])
             return chat
 
         tag = validated_data.get('tag', '')
@@ -118,5 +126,5 @@ class MembersSerializer(serializers.Serializer):
 
         # update
         if do_updated:
-            chat.update_updated()
+            chat.update_members_updated()
         return True

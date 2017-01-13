@@ -18,9 +18,4 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False),
         ),
         migrations.RunSQL('alter table xchat_member alter dnd set default false', reverse_sql=''),
-        migrations.AlterField(
-            model_name='chat',
-            name='type',
-            field=models.CharField(choices=[('self', '自聊'), ('user', '单聊'), ('users', '讨论组'), ('group', '群组'), ('cs', '客服'), ('room', '房间')], max_length=10),
-        ),
     ]

@@ -26,13 +26,13 @@ class ChatAdmin(admin.ModelAdmin):
     inlines = (MemberInline,)
     list_filter = ['type', 'tag']
     search_fields = ['id', 'title', 'tag']
-    list_display = ('id', 'type', 'title', 'tag', 'msg_id', 'last_msg_ts', 'is_deleted', 'updated', 'created')
+    list_display = ('id', 'type', 'title', 'tag', 'msg_id', 'last_msg_ts', 'is_deleted', 'updated', 'members_updated', 'created')
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            readonly_fields = ['id', 'type', 'tag', 'msg_id', 'last_msg_ts', 'created', 'updated']
+            readonly_fields = ['id', 'type', 'tag', 'msg_id', 'last_msg_ts', 'created', 'updated', 'members_updated']
         else:
-            readonly_fields = ['id', 'msg_id', 'last_msg_ts', 'created', 'updated']
+            readonly_fields = ['id', 'msg_id', 'last_msg_ts', 'created', 'updated', 'members_updated']
         return readonly_fields
 
 

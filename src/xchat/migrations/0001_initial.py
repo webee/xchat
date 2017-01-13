@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='Chat',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(choices=[('self', '自聊'), ('user', '单聊'), ('group', '群聊'), ('cs', '客服'), ('room', '房间')], max_length=10)),
+                ('type', models.CharField(choices=[('self', '自聊'), ('user', '单聊'), ('users', '讨论组'), ('group', '群聊'), ('cs', '客服'), ('room', '房间')], max_length=10)),
                 ('title', models.CharField(blank=True, default='', max_length=64, null=True)),
                 ('tag', models.CharField(blank=True, db_index=True, default='', max_length=8)),
                 ('msg_id', models.BigIntegerField(default=0)),

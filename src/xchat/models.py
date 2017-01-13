@@ -5,6 +5,7 @@ from django.utils.datetime_safe import datetime
 
 
 class ChatType:
+    XCHAT = "_xchat"  # 系统会话
     SELF = "self"
     USER = "user"
     USERS = "users"
@@ -14,6 +15,7 @@ class ChatType:
 
 
 ChatTypeChoices = [
+    (ChatType.XCHAT, "_XCHAT"),  # 系统会话
     (ChatType.SELF, "自聊"),
     (ChatType.USER, "单聊"),
     (ChatType.USERS, "讨论组"),
@@ -62,10 +64,14 @@ class Chat(models.Model):
     is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     # 添加成员之后需要更新这里
+    members_updated = models.DateTimeField(auto_now=True, editable=False)
     updated = models.DateTimeField(auto_now=True, editable=False)
 
     def update_updated(self, fields=None):
         self.save(update_fields=['updated'] + (fields if fields else []))
+
+    def update_members_updated(self, fields=None):
+        self.save(update_fields=['updated', 'members_updated'] + (fields if fields else []))
 
     @property
     def chat_id(self):
@@ -113,7 +119,7 @@ class Member(models.Model):
     # 修改成员信息时需要更新这里
     # updated = models.DateTimeField(auto_now=True, editable=False)
 
-    #def update_updated(self, fields=None):
+    # def update_updated(self, fields=None):
     #    self.save(update_fields=['updated'] + (fields if fields else []))
 
     class Meta:

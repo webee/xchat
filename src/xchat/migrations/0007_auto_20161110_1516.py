@@ -24,11 +24,6 @@ class Migration(migrations.Migration):
             field=models.BigIntegerField(default=0, editable=False),
         ),
         migrations.AlterField(
-            model_name='chat',
-            name='type',
-            field=models.CharField(choices=[('self', '自聊'), ('user', '单聊'), ('users', '讨论组'), ('group', '群组'), ('cs', '客服'), ('room', '房间')], editable=False, max_length=10),
-        ),
-        migrations.AlterField(
             model_name='member',
             name='cur_id',
             field=models.BigIntegerField(default=0, editable=False),
