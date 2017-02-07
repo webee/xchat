@@ -59,6 +59,7 @@ class ChatSerializer(serializers.ModelSerializer):
         t = validated_data['type']
         users = [encode_ns_user(ns, user) for user in validated_data['users']]
 
+        # FIXME: 这里user, self, cs在并发的时候还是有可能生产不唯一的会话
         chat = None
         owner = None
         if t == ChatType.USER:
@@ -67,14 +68,16 @@ class ChatSerializer(serializers.ModelSerializer):
 
         if t == ChatType.SELF:
             # 自聊唯一
-            chat = Chat.objects.filter(type=ChatType.SELF).filter(members__user=users[0]).first()
             owner = users[0]
+            chat = Chat.objects.filter(type=ChatType.SELF, owner=owner).first()
+            # chat = Chat.objects.filter(type=ChatType.SELF).filter(members__user=users[0]).first()
 
         if t == ChatType.CS:
             # TODO: 客服通过tag区别不同的客服团队
             # 同一tag的user客服唯一
-            chat = Chat.objects.filter(type=ChatType.CS).filter(members__user=users[0]).first()
             owner = users[0]
+            chat = Chat.objects.filter(type=ChatType.CS, owner=owner).first()
+            # chat = Chat.objects.filter(type=ChatType.CS).filter(members__user=users[0]).first()
 
         if chat is not None:
             chat.is_deleted = False
