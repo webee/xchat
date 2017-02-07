@@ -48,8 +48,6 @@ class Room(models.Model):
 
 
 class Chat(models.Model):
-    # self, user会话成员以字典序用$分割的字符串, 用来唯一表示一个会话
-    # key = models.CharField(max_length=64, null=True, unique=True, editable=False)
     type = models.CharField(max_length=10, choices=ChatTypeChoices)
     title = models.CharField(max_length=64, null=True, default="", blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
@@ -64,6 +62,9 @@ class Chat(models.Model):
     # 添加成员之后需要更新这里
     members_updated = models.DateTimeField(auto_now=True, editable=False)
     updated = models.DateTimeField(auto_now=True, editable=False)
+
+    # 所有者
+    owner = models.CharField(max_length=32, null=True, default=None, db_index=True)
 
     def update_updated(self, fields=None):
         self.save(update_fields=['updated'] + (fields if fields else []))
