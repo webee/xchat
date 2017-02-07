@@ -59,25 +59,33 @@ class ChatSerializer(serializers.ModelSerializer):
         t = validated_data['type']
         users = [encode_ns_user(ns, user) for user in validated_data['users']]
 
-        # FIXME: 这里user, self, cs在并发的时候还是有可能生产不唯一的会话
-        chat = None
+        key = None
         owner = None
-        if t == ChatType.USER:
-            # 单聊唯一
-            chat = Chat.objects.filter(type=ChatType.USER).filter(members__user=users[0]).filter(members__user=users[1]).first()
-
+        tag = validated_data.get('tag', '')
         if t == ChatType.SELF:
+            # 用户建会话
+            tag = 'user'
+            owner = users[0]
             # 自聊唯一
-            owner = users[0]
-            chat = Chat.objects.filter(type=ChatType.SELF, owner=owner).first()
-            # chat = Chat.objects.filter(type=ChatType.SELF).filter(members__user=users[0]).first()
-
-        if t == ChatType.CS:
+            key = owner
+        elif t == ChatType.USER:
+            # 用户建会话
+            tag = 'user'
+            # 单聊唯一
+            key = ','.join(sorted(users))
+        elif t == ChatType.USERS:
+            # 用户建会话
+            tag = 'user'
+        elif t == ChatType.CS:
             # TODO: 客服通过tag区别不同的客服团队
-            # 同一tag的user客服唯一
+            tag = '_cs'
             owner = users[0]
-            chat = Chat.objects.filter(type=ChatType.CS, owner=owner).first()
-            # chat = Chat.objects.filter(type=ChatType.CS).filter(members__user=users[0]).first()
+            # 同一tag的user客服唯一
+            key = '%s|%s' % (tag, owner)
+
+        chat = None
+        if t in [ChatType.SELF, ChatType.USER, ChatType.CS]:
+            chat = Chat.objects.filter(type=t, key=key).first()
 
         if chat is not None:
             chat.is_deleted = False
@@ -85,13 +93,9 @@ class ChatSerializer(serializers.ModelSerializer):
             chat.update_members_updated(fields=['is_deleted'])
             return chat
 
-        tag = validated_data.get('tag', '')
-        if t in [ChatType.SELF, ChatType.USER, ChatType.USERS]:
-            # 用户建会话
-            tag = 'user'
         title = validated_data.get('title', '')
         ext = validated_data.get('ext', '')
-        chat = Chat(type=t, tag=tag, title=title, ext=ext, owner=owner)
+        chat = Chat(type=t, key=key, tag=tag, title=title, ext=ext, owner=owner)
         chat.save()
 
         for user in users:

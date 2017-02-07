@@ -49,6 +49,11 @@ class Room(models.Model):
 
 class Chat(models.Model):
     type = models.CharField(max_length=10, choices=ChatTypeChoices)
+    # self -> '<owner>'
+    # cs -> '<tag>|<owner>'
+    # user -> '<user1>,<user2>', user1 < user2
+    key = models.CharField(max_length=100, null=True, unique=True, editable=False)
+
     title = models.CharField(max_length=64, null=True, default="", blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
     # 最后消息id, 消息id是针对每个会话的
@@ -72,6 +77,20 @@ class Chat(models.Model):
     def update_members_updated(self, fields=None):
         self.save(update_fields=['updated', 'members_updated'] + (fields if fields else []))
 
+    # only for migration.
+    def set_key(self):
+        if self.key is None:
+            if self.type == ChatType.SELF:
+                self.key = self.owner
+                self.save()
+            elif self.type == ChatType.USER:
+                users = [m.user for m in self.members.all()]
+                self.key = ','.join(sorted(users))
+                self.save()
+            elif self.type == ChatType.CS:
+                self.key = '%s|%s' % (self.tag, self.owner)
+                self.save()
+
     @property
     def chat_id(self):
         return "%s.%d" % (self.type, self.id)
@@ -79,6 +98,8 @@ class Chat(models.Model):
     class Meta:
         verbose_name = _("Chat")
         verbose_name_plural = _("Chats")
+
+        unique_together = (("type", "key"),)
 
     def __str__(self):
         return "%s#%d@%s" % (self.type, self.id, self.tag)
