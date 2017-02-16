@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='member',
             name='updated',
-            field=models.DateTimeField(auto_now=True, default=datetime.datetime(2017, 2, 16, 8, 36, 8, 114073, tzinfo=utc)),
+            field=models.DateTimeField(auto_now=True, default=datetime.datetime(1970, 1, 1, 0, 0, 0, 0, tzinfo=utc)),
             preserve_default=False,
         ),
         migrations.RunSQL("alter table xchat_member alter updated set default CURRENT_TIMESTAMP", reverse_sql=''),
