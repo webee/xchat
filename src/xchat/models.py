@@ -69,7 +69,7 @@ class Chat(models.Model):
     updated = models.DateTimeField(auto_now=True, editable=False)
 
     # 所有者
-    owner = models.CharField(max_length=32, null=True, default=None, db_index=True)
+    owner = models.CharField(max_length=32, null=True, default=None, db_index=True, blank=True)
 
     def update_updated(self, fields=None):
         self.save(update_fields=['updated'] + (fields if fields else []))
