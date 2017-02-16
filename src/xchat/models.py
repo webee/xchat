@@ -136,12 +136,11 @@ class Member(models.Model):
     dnd = models.BooleanField(default=False)
     label = models.TextField(default="", blank=True)
 
-    # TODO: 用于客户端同步我的会话信息
     # 修改成员信息时需要更新这里
-    # updated = models.DateTimeField(auto_now=True, editable=False)
+    updated = models.DateTimeField(auto_now=True, editable=False)
 
-    # def update_updated(self, fields=None):
-    #    self.save(update_fields=['updated'] + (fields if fields else []))
+    def update_updated(self, fields=None):
+        self.save(update_fields=['updated'] + (fields if fields else []))
 
     class Meta:
         verbose_name = _("Member")

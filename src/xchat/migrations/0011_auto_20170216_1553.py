@@ -17,6 +17,7 @@ class Migration(migrations.Migration):
             name='label',
             field=models.TextField(blank=True, default=''),
         ),
+        migrations.RunSQL("alter table xchat_member alter label set default ''", reverse_sql=''),
         migrations.AlterField(
             model_name='chat',
             name='owner',
