@@ -134,6 +134,7 @@ class Member(models.Model):
     is_exited = models.BooleanField(default=False)
     # Do Not Disturb
     dnd = models.BooleanField(default=False)
+    label = models.TextField(default="", blank=True)
 
     # TODO: 用于客户端同步我的会话信息
     # 修改成员信息时需要更新这里
