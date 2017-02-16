@@ -29,8 +29,12 @@ class ChatSerializer(serializers.ModelSerializer):
         return value
 
     def validate_users(self, value):
+        if len(value) <= 0:
+            return []
+        user = value[0]
         users = set(value)
-        return list(users)
+        users.remove(user)
+        return [user] + list(users)
 
     def validate(self, data):
         t = data['type']
@@ -71,11 +75,15 @@ class ChatSerializer(serializers.ModelSerializer):
         elif t == ChatType.USER:
             # 用户建会话
             tag = 'user'
+            # 创建者
+            owner = users[0]
             # 单聊唯一
             key = ','.join(sorted(users))
         elif t == ChatType.USERS:
             # 用户建会话
             tag = 'user'
+            # 创建者
+            owner = users[0]
         elif t == ChatType.CS:
             # TODO: 客服通过tag区别不同的客服团队
             tag = '_cs'
