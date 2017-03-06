@@ -91,6 +91,8 @@ class CreateChatView(APIView):
 
 
 class ChatView(APIView):
+    permission_classes = (IsAdminUser,)
+
     """
     get, search chats.
     """
@@ -116,6 +118,8 @@ class ChatView(APIView):
 
 
 class RoomChatsView(APIView):
+    permission_classes = (IsAdminUser,)
+
     """
     get, search rooms.
     """
@@ -132,6 +136,8 @@ class RoomChatsView(APIView):
 
 
 class MembersView(APIView):
+    permission_classes = (IsAdminUser,)
+
     """
     get, add, remove chat members.
     """
