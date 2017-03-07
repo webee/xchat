@@ -1,7 +1,7 @@
 import os
 
 DEBUG = False
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', 't.xchat.engdd.com']
 
 STATIC_ROOT = os.path.join('/data/xchat', 'static')
 
