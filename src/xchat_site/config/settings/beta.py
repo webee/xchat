@@ -1,4 +1,16 @@
-XCHAT_API_ROOT_URL = 'http://xchat.ddcard.com.cn'
+XCHAT_API_ROOT_URL = 'http://b.xchat.qinqinxiaobao.com'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'xchat_beta',
+        'USER': 'xchat',
+        'PASSWORD': 'xchat1234',
+        'HOST': 'localhost',
+        'PORT': '5432',
+        #'CONN_MAX_AGE': 7,
+    }
+}
 
 LOGGING = {
     'version': 1,

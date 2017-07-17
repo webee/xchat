@@ -1,11 +1,23 @@
 import os
 
 DEBUG = False
-ALLOWED_HOSTS = ['localhost', 't.xchat.engdd.com']
+ALLOWED_HOSTS = ['localhost', 't.xchat.qinqinxiaobao.com']
 
 STATIC_ROOT = os.path.join('/data/xchat', 'static')
 
-XCHAT_API_ROOT_URL = 'http://t.xchat.engdd.com'
+XCHAT_API_ROOT_URL = 'http://t.xchat.qinqinxiaobao.com'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'xchat_test',
+        'USER': 'xchat',
+        'PASSWORD': 'xchat1234',
+        'HOST': 'localhost',
+        'PORT': '5432',
+        #'CONN_MAX_AGE': 7,
+    }
+}
 
 LOGGING = {
     'version': 1,
