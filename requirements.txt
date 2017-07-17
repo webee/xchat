@@ -1,5 +1,4 @@
 Django==1.9.5
-pytz=2017.2
 djangorestframework==3.3.3
 djangorestframework_jwt==1.8.0
 django-cors-headers==1.1.0
