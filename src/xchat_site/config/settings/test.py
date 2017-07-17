@@ -1,9 +1,5 @@
-import os
-
 DEBUG = False
 ALLOWED_HOSTS = ['localhost', 't.xchat.qinqinxiaobao.com']
-
-STATIC_ROOT = os.path.join('/data/xchat', 'static')
 
 XCHAT_API_ROOT_URL = 'http://t.xchat.qinqinxiaobao.com'
 

@@ -21,7 +21,6 @@ DATABASES = load_yaml('conf/xchat/databases.yaml', root=proj_root)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_ROOT = os.path.join('/data/xchat', 'static')
 STATIC_URL = '/static/'
 
 
