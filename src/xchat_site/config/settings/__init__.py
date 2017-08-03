@@ -27,8 +27,8 @@ XCHAT_API_ROOT_URL = 'http://localhost:9981'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '4w6%)y_=gz3t_52bw5qwh6ms34^t&p4e7z+=k3q14j2-0xvyz$'
 USER_KEY = 'demo app user key.'
-TEST_USER_KEY = 'demo app user key.'
-CS_USER_KEY = 'demo app user key.'
+TEST_USER_KEY = 'demo app test key.'
+CS_USER_KEY = 'demo app cs key.'
 NS_USER_KEYS = {'': USER_KEY, 'test': TEST_USER_KEY, 'cs': CS_USER_KEY}
 
 # SECURITY WARNING: don't run with debug turned on in production!
