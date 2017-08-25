@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from xchat.authentication import decode_ns_user
+from pytoolbox.jwt import decode_ns_user
 import requests
 import json
 from ._utils import gen_token

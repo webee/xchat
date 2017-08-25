@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAdminUser
 from .models import Chat, ChatType, Member, Room
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 from pytoolbox.jwt import encode_ns_user
+from .serializers import get_or_create_member
 
 
 class UserChatsView(APIView):
@@ -87,11 +88,13 @@ class MembersView(APIView):
             raise Http404
 
     def get(self, request, chat_id, format=None):
+        """获取会话成员"""
         chat = self.get_chat(chat_id)
         serializer = MemberSerializer(chat.members.all(), many=True)
         return Response(serializer.data)
 
     def post(self, request, chat_id, format=None):
+        """添加会话成员"""
         chat = self.get_chat(chat_id)
         # 只能给群组会话增加成员
         if chat.type not in [ChatType.GROUP]:
@@ -105,6 +108,7 @@ class MembersView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, chat_id, format=None):
+        """删除会话成员"""
         chat = self.get_chat(chat_id)
         # 只能从群组会话删除成员
         if chat.type not in [ChatType.GROUP]:
@@ -124,3 +128,43 @@ class MembersView(APIView):
                 'ok': True
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, chat_id, format=None):
+        """替换会话成员"""
+        chat = self.get_chat(chat_id)
+        # 只能从群组会话删除成员
+        if chat.type not in [ChatType.GROUP]:
+            return Response({'ok': False}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = MembersSerializer(data=request.data)
+        if serializer.is_valid():
+            ns = request.user.ns
+            users = serializer.validated_data['users']
+            new_users = [encode_ns_user(ns, user) for user in users]
+
+            update_chat_members(chat, new_users)
+            return Response({
+                'ok': True
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@transaction.atomic
+def update_chat_members(chat, new_users):
+    old_users = [m.user for m in chat.members.all()]
+
+    to_delete_users = list(set(old_users) - set(new_users))
+    to_add_users = list(set(new_users) - set(old_users))
+
+    do_updated = False
+    if len(to_delete_users) > 0:
+        do_updated = True
+        chat.members.filter(user__in=to_delete_users).delete()
+
+    if len(to_add_users) > 0:
+        do_updated = True
+        for user in to_add_users:
+            get_or_create_member(chat, user)
+
+    if do_updated:
+        chat.update_members_updated()

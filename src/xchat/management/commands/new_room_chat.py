@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.db.models import Max
 from xchat.models import Room, Chat, ChatType, RoomChat
 
 

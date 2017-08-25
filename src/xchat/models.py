@@ -54,7 +54,11 @@ class Chat(models.Model):
     # user -> '<user1>,<user2>', user1 < user2
     key = models.CharField(max_length=100, null=True, unique=True, editable=False)
 
-    title = models.CharField(max_length=64, null=True, default="", blank=True)
+    # biz id
+    biz_id = models.CharField(max_length=64, null=True, unique=True, blank=True)
+    mq_topic = models.CharField(max_length=16, null=False, default="", blank=True)
+
+    title = models.CharField(max_length=64, null=False, default="", blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
     # 最后消息id, 消息id是针对每个会话的
     msg_id = models.BigIntegerField(editable=False, default=0)
@@ -100,6 +104,11 @@ class Chat(models.Model):
         verbose_name_plural = _("Chats")
 
         unique_together = (("type", "key"),)
+
+    def save(self, *args, **kwargs):
+        if not self.biz_id:
+            self.biz_id = None
+        super(Chat, self).save(*args, **kwargs)
 
     def __str__(self):
         return "%s#%d@%s" % (self.type, self.id, self.tag)

@@ -13,6 +13,8 @@ class MemberSerializer(serializers.ModelSerializer):
 class ChatSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source="chat_id")
     type = serializers.CharField(allow_blank=False, max_length=10)
+    biz_id = serializers.CharField(allow_blank=False, max_length=64, allow_null=True)
+    mq_topic = serializers.CharField(allow_blank=True, max_length=16)
     tag = serializers.CharField(allow_blank=True, max_length=8)
     msg_id = serializers.ReadOnlyField()
     is_deleted = serializers.ReadOnlyField()
@@ -21,7 +23,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('id', 'type', 'users', 'title', 'tag', 'msg_id', 'ext', 'is_deleted', 'created')
+        fields = ('id', 'biz_id', 'mq_topic', 'type', 'users', 'title', 'tag', 'msg_id', 'ext', 'is_deleted', 'created')
 
     def validate_type(self, value):
         if value not in ChatTypes:
@@ -91,19 +93,31 @@ class ChatSerializer(serializers.ModelSerializer):
             # 同一tag的user客服唯一
             key = '%s|%s' % (tag, owner)
 
+        mq_topic = validated_data.get('mq_topic', '')
+        title = validated_data.get('title', '')
+        ext = validated_data.get('ext', '')
         chat = None
         if t in [ChatType.SELF, ChatType.USER, ChatType.CS]:
             chat = Chat.objects.filter(type=t, key=key).first()
 
+        biz_id = validated_data.get('biz_id')
+        if t != ChatType.GROUP:
+            biz_id = None
+
+        if biz_id:
+            # biz id唯一
+            chat = Chat.objects.filter(biz_id=biz_id).first()
+
         if chat is not None:
             chat.is_deleted = False
+            chat.mq_topic = mq_topic
+            chat.title = title
+            chat.ext = ext
             # update
-            chat.update_members_updated(fields=['is_deleted'])
+            chat.update_members_updated(fields=['is_deleted', 'mq_topic', 'title', 'ext'])
             return chat
 
-        title = validated_data.get('title', '')
-        ext = validated_data.get('ext', '')
-        chat = Chat(type=t, key=key, tag=tag, title=title, ext=ext, owner=owner)
+        chat = Chat(type=t, key=key, biz_id=biz_id, mq_topic=mq_topic, tag=tag, title=title, ext=ext, owner=owner)
         chat.save()
 
         for user in users:
@@ -125,16 +139,20 @@ class MembersSerializer(serializers.Serializer):
 
         do_updated = False
         for user in users:
-            member, created = Member.objects.get_or_create(chat=chat, user=user)
-            if created or member.is_exited:
-                do_updated = True
-                member.cur_id = chat.msg_id
-                member.join_msg_id = chat.msg_id
-                member.is_exited = False
-                member.dnd = False
-                member.save()
+            do_updated = get_or_create_member(chat, user)
 
         # update
         if do_updated:
             chat.update_members_updated()
+        return True
+
+
+def get_or_create_member(chat, user):
+    member, created = Member.objects.get_or_create(chat=chat, user=user)
+    if created or member.is_exited:
+        member.cur_id = chat.msg_id
+        member.join_msg_id = chat.msg_id
+        member.is_exited = False
+        member.dnd = False
+        member.save()
         return True
