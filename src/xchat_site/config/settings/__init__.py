@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 import datetime
-from utils.pmc_config import get_project_root
+from pytoolbox.util.pmc_config import get_project_root
 
 proj_root = get_project_root()
 src_root = os.path.join(proj_root, 'src')
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'xchat_site.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'xchat',
+        'NAME': 'xchat_dev',
         'USER': 'xchat',
         'PASSWORD': 'xchat1234',
         'HOST': 'localhost',
@@ -135,7 +135,7 @@ STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAdminUser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'xchat.authentication.JWTAuthentication',

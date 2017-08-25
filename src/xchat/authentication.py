@@ -1,15 +1,9 @@
-import jwt
 from rest_framework_jwt.settings import api_settings
-from pytoolbox.jwt import encode_ns_user, decode_ns_user, encode_ns_token, parse_ns_token
-from pytoolbox.jwt import handle_jwt_decode, handle_jwt_encode
+from pytoolbox.jwt import handle_jwt_decode
 
 
 def jwt_decode_handler(token):
     return handle_jwt_decode(token, api_settings)
-
-
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from rest_framework import exceptions
 
 
 class VirtualUser(object):
@@ -22,6 +16,9 @@ class VirtualUser(object):
 
     def is_authenticated(self):
         return True
+
+
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 
 class JWTAuthentication(JSONWebTokenAuthentication):

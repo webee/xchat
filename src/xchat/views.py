@@ -4,66 +4,12 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
-from django.http.response import JsonResponse
-import time
-import json
 from .models import Chat, ChatType, Member, Room
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
-from xchat.authentication import encode_ns_user
-
-
-def test(request):
-    params = request.GET
-    res = {'st': time.time()}
-    status_code = int(params.get("status", 200))
-    sleep = params.get("sleep")
-    if sleep:
-        time.sleep(float(sleep))
-
-    ok = params.get("not_ok") is None or not params.get("not_ok") == "false"
-
-    res['ok'] = ok
-    if not ok:
-        code = params.get("code")
-        error = params.get("error")
-        if code is not None:
-            res["code"] = int(code)
-        if error is not None:
-            res["error"] = error
-    else:
-        data = params.get("data")
-        if data is not None:
-            try:
-                res["data"] = json.loads(data)
-            except json.JSONDecodeError:
-                res["data"] = data
-
-    res['et'] = time.time()
-    return JsonResponse(res, status=status_code)
-
-
-def db(request):
-    res = {'st': time.time()}
-
-    chat = Chat.objects.get(pk=1)
-    time.sleep(float(0.01))
-
-    res['x'] = chat.msg_id
-    res['et'] = time.time()
-    res['ok'] = True
-    return JsonResponse(res, status=status.HTTP_200_OK)
-
-
-class TestView(APIView):
-    permission_classes = (IsAdminUser,)
-
-    def get(self, request):
-        return Response({'ok': True, 't': time.time()})
+from pytoolbox.jwt import encode_ns_user
 
 
 class UserChatsView(APIView):
-    permission_classes = (IsAdminUser,)
-
     def get(self, request):
         user = request.query_params.get("user")
         t = request.query_params.get("type")
@@ -77,8 +23,6 @@ class UserChatsView(APIView):
 
 
 class CreateChatView(APIView):
-    permission_classes = (IsAdminUser,)
-
     def post(self, request):
         serializer = ChatSerializer(data=request.data)
         if serializer.is_valid():
@@ -91,8 +35,6 @@ class CreateChatView(APIView):
 
 
 class ChatView(APIView):
-    permission_classes = (IsAdminUser,)
-
     """
     get, search chats.
     """
@@ -118,8 +60,6 @@ class ChatView(APIView):
 
 
 class RoomChatsView(APIView):
-    permission_classes = (IsAdminUser,)
-
     """
     get, search rooms.
     """
@@ -136,8 +76,6 @@ class RoomChatsView(APIView):
 
 
 class MembersView(APIView):
-    permission_classes = (IsAdminUser,)
-
     """
     get, add, remove chat members.
     """

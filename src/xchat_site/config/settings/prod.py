@@ -1,6 +1,5 @@
-import os
 import datetime
-from utils.pmc_config import get_project_root, load_yaml, read_string
+from pytoolbox.util.pmc_config import get_project_root, load_yaml, read_string
 
 proj_root = get_project_root()
 DEBUG = False

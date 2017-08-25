@@ -1,6 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
-from xchat.authentication import encode_ns_user
+from pytoolbox.jwt import encode_ns_user
 from .models import Chat, Member, ChatTypes, ChatType
 
 
