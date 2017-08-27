@@ -65,7 +65,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
         key = None
         owner = None
-        tag = validated_data.get('tag', '')
+        tag = validated_data.get('tag')
         if t == ChatType.SELF:
             # 用户建会话
             tag = 'user'
@@ -91,9 +91,9 @@ class ChatSerializer(serializers.ModelSerializer):
             # 同一tag的user客服唯一
             key = '%s|%s' % (tag, owner)
 
-        mq_topic = validated_data.get('mq_topic', '')
-        title = validated_data.get('title', '')
-        ext = validated_data.get('ext', '')
+        mq_topic = validated_data.get('mq_topic')
+        title = validated_data.get('title')
+        ext = validated_data.get('ext')
         chat = None
         if t in [ChatType.SELF, ChatType.USER, ChatType.CS]:
             chat = Chat.objects.filter(type=t, key=key).first()
@@ -108,24 +108,29 @@ class ChatSerializer(serializers.ModelSerializer):
 
         if chat is not None:
             chat.is_deleted = False
-            if mq_topic:
-                chat.mq_topic = mq_topic
-            if title:
-                chat.title = title
-            if tag:
-                chat.tag = tag
-            if ext:
-                chat.ext = ext
+            set_update_chat(chat, mq_topic, title, tag, ext)
             # update
-            chat.update_members_updated(fields=['is_deleted', 'mq_topic', 'title', 'tag', 'ext'])
+            chat.update_updated(fields=['is_deleted', 'mq_topic', 'title', 'tag', 'ext'])
             return chat
 
-        chat = Chat(type=t, key=key, biz_id=biz_id, mq_topic=mq_topic, tag=tag, title=title, ext=ext, owner=owner)
+        chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner)
+        set_update_chat(chat, mq_topic, title, tag, ext)
         chat.save()
 
         for user in users:
             member, _ = Member.objects.get_or_create(chat=chat, user=user)
         return chat
+
+
+def set_update_chat(chat, mq_topic=None, title=None, tag=None, ext=None):
+        if mq_topic is not None:
+            chat.mq_topic = mq_topic
+        if title is not None:
+            chat.title = title
+        if tag is not None:
+            chat.tag = tag
+        if ext is not None:
+            chat.ext = ext
 
 
 class MembersSerializer(serializers.Serializer):

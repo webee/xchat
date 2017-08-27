@@ -24,6 +24,8 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 class JWTAuthentication(JSONWebTokenAuthentication):
     def get_jwt_value(self, request):
         jwt = super(JWTAuthentication, self).get_jwt_value(request)
+        if jwt:
+            jwt = jwt.decode('utf-8')
         return jwt or request.query_params.get('jwt')
 
     def authenticate_credentials(self, payload):

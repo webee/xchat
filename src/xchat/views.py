@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAdminUser
 from .models import Chat, ChatType, Member, Room
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 from pytoolbox.jwt import encode_ns_user
-from .serializers import get_or_create_member
+from .serializers import get_or_create_member, set_update_chat
 
 
 class UserChatsView(APIView):
@@ -53,6 +53,23 @@ class ChatView(APIView):
         chat = self.get_chat(chat_id)
         serializer = ChatSerializer(chat, context={'request': request})
         return Response(serializer.data)
+
+    def post(self, request, chat_id):
+        chat = self.get_chat(chat_id)
+        data = dict(request.data)
+        data.update(dict(type=chat.type, biz_id=chat.biz_id))
+        serializer = ChatSerializer(data=data)
+        if serializer.is_valid():
+            mq_topic = serializer.validated_data.get('mq_topic')
+            title = serializer.validated_data.get('title')
+            tag = serializer.validated_data.get('tag')
+            ext = serializer.validated_data.get('ext')
+
+            set_update_chat(chat, mq_topic, title, tag, ext)
+            chat.save()
+
+            return Response({'ok': True})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @transaction.atomic
     def delete(self, request, chat_id):
