@@ -13,9 +13,7 @@ class MemberSerializer(serializers.ModelSerializer):
 class ChatSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source="chat_id")
     type = serializers.CharField(allow_blank=False, max_length=10)
-    biz_id = serializers.CharField(allow_blank=False, max_length=64, allow_null=True)
-    mq_topic = serializers.CharField(allow_blank=True, max_length=16)
-    tag = serializers.CharField(allow_blank=True, max_length=8)
+    biz_id = serializers.CharField(allow_blank=False, max_length=64, allow_null=True, default=None)
     msg_id = serializers.ReadOnlyField()
     is_deleted = serializers.ReadOnlyField()
     users = serializers.ListField(required=False, write_only=True,
@@ -110,11 +108,16 @@ class ChatSerializer(serializers.ModelSerializer):
 
         if chat is not None:
             chat.is_deleted = False
-            chat.mq_topic = mq_topic
-            chat.title = title
-            chat.ext = ext
+            if mq_topic:
+                chat.mq_topic = mq_topic
+            if title:
+                chat.title = title
+            if tag:
+                chat.tag = tag
+            if ext:
+                chat.ext = ext
             # update
-            chat.update_members_updated(fields=['is_deleted', 'mq_topic', 'title', 'ext'])
+            chat.update_members_updated(fields=['is_deleted', 'mq_topic', 'title', 'tag', 'ext'])
             return chat
 
         chat = Chat(type=t, key=key, biz_id=biz_id, mq_topic=mq_topic, tag=tag, title=title, ext=ext, owner=owner)
