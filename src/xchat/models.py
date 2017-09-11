@@ -55,7 +55,7 @@ class Chat(models.Model):
     key = models.CharField(max_length=100, null=True, unique=True, editable=False)
 
     # biz id
-    biz_id = models.CharField(max_length=64, null=True, unique=True, blank=True)
+    biz_id = models.CharField(max_length=160, null=True, unique=True, blank=True)
     mq_topic = models.CharField(max_length=16, null=False, default="", blank=True)
 
     title = models.CharField(max_length=64, null=False, default="", blank=True)
