@@ -17,7 +17,7 @@ class ChatSerializer(serializers.ModelSerializer):
     msg_id = serializers.ReadOnlyField()
     is_deleted = serializers.ReadOnlyField()
     users = serializers.ListField(required=False, write_only=True,
-                                  child=serializers.CharField(allow_blank=False, max_length=32), default=[])
+                                  child=serializers.CharField(allow_blank=False, max_length=100), default=[])
 
     class Meta:
         model = Chat
@@ -111,30 +111,29 @@ class ChatSerializer(serializers.ModelSerializer):
             set_update_chat(chat, mq_topic, title, tag, ext)
             # update
             chat.update_updated(fields=['is_deleted', 'mq_topic', 'title', 'tag', 'ext'])
-            return chat
+        else:
+            chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner)
+            set_update_chat(chat, mq_topic, title, tag, ext)
+            chat.save()
 
-        chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner)
-        set_update_chat(chat, mq_topic, title, tag, ext)
-        chat.save()
-
-        for user in users:
-            member, _ = Member.objects.get_or_create(chat=chat, user=user)
+        update_chat_members(chat, users)
         return chat
 
 
 def set_update_chat(chat, mq_topic=None, title=None, tag=None, ext=None):
-        if mq_topic is not None:
-            chat.mq_topic = mq_topic
-        if title is not None:
-            chat.title = title
-        if tag is not None:
-            chat.tag = tag
-        if ext is not None:
-            chat.ext = ext
+    if mq_topic is not None:
+        chat.mq_topic = mq_topic
+    if title is not None:
+        chat.title = title
+    if tag is not None:
+        chat.tag = tag
+    if ext is not None:
+        chat.ext = ext
 
 
 class MembersSerializer(serializers.Serializer):
-    users = serializers.ListField(required=False, child=serializers.CharField(allow_blank=False, max_length=32), default=[])
+    users = serializers.ListField(required=False, child=serializers.CharField(allow_blank=False, max_length=100),
+                                  default=[])
 
     def update(self, instance, validated_data):
         return self.create(validated_data)
@@ -145,14 +144,18 @@ class MembersSerializer(serializers.Serializer):
         chat = validated_data['chat']
         users = [encode_ns_user(ns, user) for user in validated_data['users']]
 
-        do_updated = False
-        for user in users:
-            do_updated = get_or_create_member(chat, user)
-
-        # update
-        if do_updated:
-            chat.update_members_updated()
+        chat_update_users(chat, users)
         return True
+
+
+def chat_update_users(chat, users):
+    do_updated = False
+    for user in users:
+        do_updated = get_or_create_member(chat, user)
+
+    # update
+    if do_updated:
+        chat.update_members_updated()
 
 
 def get_or_create_member(chat, user):
@@ -164,3 +167,24 @@ def get_or_create_member(chat, user):
         member.dnd = False
         member.save()
         return True
+
+
+@transaction.atomic
+def update_chat_members(chat, new_users):
+    old_users = [m.user for m in chat.members.all()]
+
+    to_delete_users = list(set(old_users) - set(new_users))
+    to_add_users = list(set(new_users) - set(old_users))
+
+    do_updated = False
+    if len(to_delete_users) > 0:
+        do_updated = True
+        chat.members.filter(user__in=to_delete_users).delete()
+
+    if len(to_add_users) > 0:
+        do_updated = True
+        for user in to_add_users:
+            get_or_create_member(chat, user)
+
+    if do_updated:
+        chat.update_members_updated()

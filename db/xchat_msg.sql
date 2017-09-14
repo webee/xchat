@@ -7,7 +7,7 @@ CREATE TABLE xchat_message
   chat_id bigint NOT NULL,
   chat_type character varying(10) NOT NULL,
   id bigint NOT NULL,
-  uid character varying(32) NOT NULL,
+  uid character varying(100) NOT NULL,
   ts timestamp with time zone NOT NULL,
   msg text NOT NULL,
   domain character varying(16) NOT NULL,

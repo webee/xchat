@@ -131,7 +131,7 @@ class RoomChat(models.Model):
 
 class Member(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="members")
-    user = models.CharField(max_length=32, null=False, db_index=True)
+    user = models.CharField(max_length=100, null=False, db_index=True)
 
     joined = models.DateTimeField(auto_now_add=True, editable=False)
     # 加入时的消息id

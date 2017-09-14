@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAdminUser
 from .models import Chat, ChatType, Member, Room
 from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
 from pytoolbox.jwt import encode_ns_user
-from .serializers import get_or_create_member, set_update_chat
+from .serializers import get_or_create_member, set_update_chat, update_chat_members
 
 
 class UserChatsView(APIView):
@@ -157,31 +157,10 @@ class MembersView(APIView):
         if serializer.is_valid():
             ns = request.user.ns
             users = serializer.validated_data['users']
-            new_users = [encode_ns_user(ns, user) for user in users]
+            users = [encode_ns_user(ns, user) for user in users]
 
-            update_chat_members(chat, new_users)
+            update_chat_members(chat, users)
             return Response({
                 'ok': True
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@transaction.atomic
-def update_chat_members(chat, new_users):
-    old_users = [m.user for m in chat.members.all()]
-
-    to_delete_users = list(set(old_users) - set(new_users))
-    to_add_users = list(set(new_users) - set(old_users))
-
-    do_updated = False
-    if len(to_delete_users) > 0:
-        do_updated = True
-        chat.members.filter(user__in=to_delete_users).delete()
-
-    if len(to_add_users) > 0:
-        do_updated = True
-        for user in to_add_users:
-            get_or_create_member(chat, user)
-
-    if do_updated:
-        chat.update_members_updated()
