@@ -21,7 +21,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('id', 'biz_id', 'mq_topic', 'type', 'users', 'title', 'tag', 'msg_id', 'ext', 'is_deleted', 'created')
+        fields = ('id', 'biz_id', 'app_id', 'type', 'users', 'title', 'tag', 'msg_id', 'ext', 'is_deleted', 'created')
 
     def validate_type(self, value):
         if value not in ChatTypes:
@@ -91,7 +91,7 @@ class ChatSerializer(serializers.ModelSerializer):
             # 同一tag的user客服唯一
             key = '%s|%s' % (tag, owner)
 
-        mq_topic = validated_data.get('mq_topic')
+        app_id = validated_data.get('app_id')
         title = validated_data.get('title')
         ext = validated_data.get('ext')
         chat = None
@@ -108,21 +108,21 @@ class ChatSerializer(serializers.ModelSerializer):
 
         if chat is not None:
             chat.is_deleted = False
-            set_update_chat(chat, mq_topic, title, tag, ext)
+            set_update_chat(chat, app_id, title, tag, ext)
             # update
-            chat.update_updated(fields=['is_deleted', 'mq_topic', 'title', 'tag', 'ext'])
+            chat.update_updated(fields=['is_deleted', 'app_id', 'title', 'tag', 'ext'])
         else:
             chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner)
-            set_update_chat(chat, mq_topic, title, tag, ext)
+            set_update_chat(chat, app_id, title, tag, ext)
             chat.save()
 
         update_chat_members(chat, users)
         return chat
 
 
-def set_update_chat(chat, mq_topic=None, title=None, tag=None, ext=None):
-    if mq_topic is not None:
-        chat.mq_topic = mq_topic
+def set_update_chat(chat, app_id=None, title=None, tag=None, ext=None):
+    if app_id is not None:
+        chat.app_id = app_id
     if title is not None:
         chat.title = title
     if tag is not None:

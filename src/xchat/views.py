@@ -60,12 +60,12 @@ class ChatView(APIView):
         data.update(dict(type=chat.type, biz_id=chat.biz_id))
         serializer = ChatSerializer(data=data)
         if serializer.is_valid():
-            mq_topic = serializer.validated_data.get('mq_topic')
+            app_id = serializer.validated_data.get('app_id')
             title = serializer.validated_data.get('title')
             tag = serializer.validated_data.get('tag')
             ext = serializer.validated_data.get('ext')
 
-            set_update_chat(chat, mq_topic, title, tag, ext)
+            set_update_chat(chat, app_id, title, tag, ext)
             chat.save()
 
             return Response({'ok': True})

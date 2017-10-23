@@ -25,6 +25,22 @@ ChatTypeChoices = [
 ChatTypes = {c[0] for c in ChatTypeChoices}
 
 
+class App(models.Model):
+    app_id = models.CharField(max_length=16, null=False, unique=True)
+    # 消息通知url
+    msg_notify_url = models.CharField(max_length=128, null=True, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    updated = models.DateTimeField(auto_now=True, editable=False)
+
+    class Meta:
+        verbose_name = _("App")
+        verbose_name_plural = _("Apps")
+
+    def __str__(self):
+        return "<App: %s>" % (self.app_id,)
+
+
 class Room(models.Model):
     title = models.CharField(max_length=64, null=True, default="", blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
@@ -55,8 +71,8 @@ class Chat(models.Model):
     key = models.CharField(max_length=100, null=True, unique=True, editable=False)
 
     # biz id
+    app_id = models.CharField(max_length=16, null=True, blank=True)
     biz_id = models.CharField(max_length=160, null=True, unique=True, blank=True)
-    mq_topic = models.CharField(max_length=16, null=False, default="", blank=True)
 
     title = models.CharField(max_length=64, null=False, default="", blank=True)
     tag = models.CharField(max_length=8, null=False, default="", db_index=True, blank=True)
