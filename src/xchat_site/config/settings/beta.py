@@ -4,7 +4,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'xchat_beta',
-        'USER': 'xchat_beta',
+        'USER': 'xchat_dev',
         'PASSWORD': 'xchat1234',
         'HOST': 'localhost',
         'PORT': '5432',
