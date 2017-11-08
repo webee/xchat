@@ -16,6 +16,8 @@ urlpatterns = [
     url(r'^user/chats/$', views.UserChatsView.as_view(), name='user-chats'),
     url(r'^rooms/(?P<room_id>\d+)/chats/$', views.RoomChatsView.as_view(), name='room-chats'),
 
+    url(r'^chats/(?P<chat_id>\w*\.\d+)/msgs/$', views.ChatMessagesView.as_view(), name='messages'),
+
     # stats
     url(r'^stat/chat/user/msgs/$', stat_views.StatChatUserMsgsView.as_view(), name='stat-chat-user-msgs'),
 ]

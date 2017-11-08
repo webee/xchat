@@ -1,7 +1,9 @@
-from django.db import transaction
+import arrow
+from django.db import transaction, connection
 from rest_framework import serializers
 from pytoolbox.jwt import encode_ns_user
 from .models import Chat, Member, ChatTypes, ChatType
+from .ex_models import Message
 
 
 class MemberSerializer(serializers.ModelSerializer):
@@ -15,14 +17,14 @@ class ChatSerializer(serializers.ModelSerializer):
     type = serializers.CharField(allow_blank=False, max_length=10)
     app_id = serializers.CharField(required=False, allow_blank=False, max_length=16, allow_null=True, default=None)
     biz_id = serializers.CharField(required=False, allow_blank=False, max_length=160, allow_null=True, default=None)
-    msg_id = serializers.IntegerField(required=False, min_value=0, default=0)
+    start_msg_id = serializers.IntegerField(required=False, min_value=0, default=0)
     is_deleted = serializers.ReadOnlyField()
     users = serializers.ListField(required=False, write_only=True,
                                   child=serializers.CharField(allow_blank=False, max_length=100), default=[])
 
     class Meta:
         model = Chat
-        fields = ('id', 'biz_id', 'app_id', 'type', 'users', 'title', 'tag', 'msg_id', 'ext', 'is_deleted', 'created')
+        fields = ('id', 'biz_id', 'app_id', 'type', 'users', 'title', 'tag', 'start_msg_id', 'ext', 'is_deleted', 'created')
 
     def validate_type(self, value):
         if value not in ChatTypes:
@@ -93,7 +95,7 @@ class ChatSerializer(serializers.ModelSerializer):
             key = '%s|%s' % (tag, owner)
 
         app_id = validated_data.get('app_id')
-        msg_id = validated_data.get('msg_id')
+        start_msg_id = validated_data.get('start_msg_id')
         title = validated_data.get('title')
         ext = validated_data.get('ext')
         chat = None
@@ -114,7 +116,7 @@ class ChatSerializer(serializers.ModelSerializer):
             # update
             chat.update_updated(fields=['is_deleted', 'app_id', 'title', 'tag', 'ext'])
         else:
-            chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner, msg_id=msg_id)
+            chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner, start_msg_id=start_msg_id, msg_id=start_msg_id)
             set_update_chat(chat, app_id, title, tag, ext)
             chat.save()
 
@@ -190,3 +192,50 @@ def update_chat_members(chat, new_users):
 
     if do_updated:
         chat.update_members_updated()
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    ts = serializers.FloatField()
+    domain = serializers.CharField(required=False, max_length=16, default='')
+
+    class Meta:
+        model = Message
+        fields = ('uid', 'msg', 'ts', 'domain')
+
+
+class MessagesSerializer(serializers.Serializer):
+    msgs = serializers.ListField(required=False, child=MessageSerializer(), default=[])
+
+    def update(self, instance, validated_data):
+        return self.create(validated_data)
+
+    def create(self, validated_data):
+        ns = validated_data['ns']
+        chat = validated_data['chat']
+
+        msgs = [dict(uid=encode_ns_user(ns, msg.get('uid')),
+                     ts=arrow.get(msg.get('ts')).datetime,
+                     msg=msg.get('msg'),
+                     domain=msg.get('domain')) for msg in validated_data['msgs']]
+
+        if len(msgs) <= 0:
+            return 0
+
+        return chat_insert_msgs(chat, msgs)
+
+
+@transaction.atomic
+def chat_insert_msgs(chat, msgs):
+    chat = Chat.objects.select_for_update().get(pk=chat.id)
+    n = 0
+    with connection.cursor() as cursor:
+        for msg in msgs:
+            if chat.start_msg_id <= 0:
+                break
+            cursor.execute('INSERT INTO xchat_message(chat_id, chat_type, id, uid, ts, msg, domain) VALUES(%s, %s, %s, %s, %s, %s, %s)',
+                           [chat.id, chat.type, chat.start_msg_id, msg['uid'], msg['ts'], msg['msg'], msg['domain']])
+            chat.start_msg_id -= 1
+            n += 1
+    chat.update_updated(fields=['start_msg_id'])
+
+    return n

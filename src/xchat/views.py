@@ -5,9 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from .models import Chat, ChatType, Member, Room
-from .serializers import ChatSerializer, MembersSerializer, MemberSerializer
+from .serializers import ChatSerializer, MembersSerializer, MemberSerializer, MessagesSerializer
 from pytoolbox.jwt import encode_ns_user
-from .serializers import get_or_create_member, set_update_chat, update_chat_members
+from .serializers import set_update_chat, update_chat_members
 
 
 class UserChatsView(APIView):
@@ -163,4 +163,30 @@ class MembersView(APIView):
             return Response({
                 'ok': True
             }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChatMessagesView(APIView):
+    """
+    insert chat messages.
+    """
+    def get_chat(self, chat_id):
+        chat_id = int(chat_id.split('.', 1)[1])
+        try:
+            return Chat.objects.get(id=chat_id, is_deleted=False)
+        except Chat.DoesNotExist:
+            raise Http404
+
+    def post(self, request, chat_id):
+        """向前插入消息"""
+        chat = self.get_chat(chat_id)
+        if chat.start_msg_id <= 0:
+            return Response({'ok': False})
+
+        serializer = MessagesSerializer(data=request.data)
+        if serializer.is_valid():
+            n = serializer.save(ns=request.user.ns, chat=chat)
+            return Response({
+                'ok': True, 'n': n
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

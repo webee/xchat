@@ -13,7 +13,7 @@ class Message(models.Model):
     uid = models.CharField(max_length=32)
     ts = models.DateTimeField()
     msg = models.TextField()
-    domain = models.CharField(max_length=16)
+    domain = models.CharField(max_length=16, blank=True)
 
     objects = ReadOnlyManager()
 

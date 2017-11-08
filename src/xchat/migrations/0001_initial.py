@@ -55,6 +55,7 @@ class Migration(migrations.Migration):
                 ('biz_id', models.CharField(blank=True, max_length=160, null=True, unique=True)),
                 ('title', models.CharField(blank=True, default='', max_length=64)),
                 ('tag', models.CharField(blank=True, db_index=True, default='', max_length=8)),
+                ('start_msg_id', models.BigIntegerField(default=0, editable=False)),
                 ('msg_id', models.BigIntegerField(default=0, editable=False)),
                 ('last_msg_ts', models.DateTimeField(default=datetime.datetime(1970, 1, 1, 0, 0), editable=False)),
                 ('ext', models.TextField(blank=True, default='')),
