@@ -13,8 +13,9 @@ class MemberSerializer(serializers.ModelSerializer):
 class ChatSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source="chat_id")
     type = serializers.CharField(allow_blank=False, max_length=10)
-    biz_id = serializers.CharField(allow_blank=False, max_length=160, allow_null=True, default=None)
-    msg_id = serializers.ReadOnlyField()
+    app_id = serializers.CharField(required=False, allow_blank=False, max_length=16, allow_null=True, default=None)
+    biz_id = serializers.CharField(required=False, allow_blank=False, max_length=160, allow_null=True, default=None)
+    msg_id = serializers.IntegerField(required=False, min_value=0, default=0)
     is_deleted = serializers.ReadOnlyField()
     users = serializers.ListField(required=False, write_only=True,
                                   child=serializers.CharField(allow_blank=False, max_length=100), default=[])
@@ -92,6 +93,7 @@ class ChatSerializer(serializers.ModelSerializer):
             key = '%s|%s' % (tag, owner)
 
         app_id = validated_data.get('app_id')
+        msg_id = validated_data.get('msg_id')
         title = validated_data.get('title')
         ext = validated_data.get('ext')
         chat = None
@@ -112,7 +114,7 @@ class ChatSerializer(serializers.ModelSerializer):
             # update
             chat.update_updated(fields=['is_deleted', 'app_id', 'title', 'tag', 'ext'])
         else:
-            chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner)
+            chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner, msg_id=msg_id)
             set_update_chat(chat, app_id, title, tag, ext)
             chat.save()
 
