@@ -27,8 +27,8 @@ ChatTypes = {c[0] for c in ChatTypeChoices}
 
 class App(models.Model):
     app_id = models.CharField(max_length=16, null=False, unique=True)
-    # 消息通知url
-    msg_notify_url = models.CharField(max_length=128, null=True, blank=True)
+    # 事件通知url
+    event_notify_url = models.CharField(max_length=128, null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True, editable=False)
     updated = models.DateTimeField(auto_now=True, editable=False)

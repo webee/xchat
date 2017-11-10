@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('app_id', models.CharField(max_length=16, unique=True)),
-                ('msg_notify_url', models.CharField(blank=True, max_length=128, null=True)),
+                ('event_notify_url', models.CharField(blank=True, max_length=128, null=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
             ],
