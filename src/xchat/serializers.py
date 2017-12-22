@@ -6,6 +6,11 @@ from .models import Chat, Member, ChatTypes, ChatType
 from .ex_models import Message
 
 
+def decode_chat_id(chat_id):
+    parts = chat_id.split('.', 1)
+    return parts[0], int(parts[1])
+
+
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
@@ -13,7 +18,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
 
 class ChatSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source="chat_id")
+    id = serializers.CharField(required=False, allow_blank=False, source="chat_id")
     type = serializers.CharField(allow_blank=False, max_length=10)
     app_id = serializers.CharField(required=False, allow_blank=False, max_length=16, allow_null=True, default=None)
     biz_id = serializers.CharField(required=False, allow_blank=False, max_length=160, allow_null=True, default=None)
@@ -65,6 +70,11 @@ class ChatSerializer(serializers.ModelSerializer):
         ns = validated_data['ns']
         t = validated_data['type']
         users = [encode_ns_user(ns, user) for user in validated_data['users']]
+        chat_id = validated_data.get('chat_id')
+        id = None
+        if chat_id:
+            # 指定chat_id, 则优先使用这里的t
+            t, id = decode_chat_id(chat_id)
 
         key = None
         owner = None
@@ -99,22 +109,23 @@ class ChatSerializer(serializers.ModelSerializer):
         title = validated_data.get('title')
         ext = validated_data.get('ext')
         chat = None
-        if t in [ChatType.SELF, ChatType.USER, ChatType.CS]:
+        if id:
+            chat = Chat.objects.filter(id=id, type=t).first()
+        elif t in [ChatType.SELF, ChatType.USER, ChatType.CS]:
             chat = Chat.objects.filter(type=t, key=key).first()
 
         biz_id = validated_data.get('biz_id')
         if t != ChatType.GROUP:
             biz_id = None
 
-        if biz_id:
+        if not chat and biz_id:
             # biz id唯一
             chat = Chat.objects.filter(biz_id=biz_id).first()
 
         if chat is not None:
-            chat.is_deleted = False
-            set_update_chat(chat, app_id, title, tag, ext)
+            updated_fields = set_update_chat(chat, biz_id, app_id, title, tag, ext, is_deleted=False)
             # update
-            chat.update_updated(fields=['is_deleted', 'app_id', 'title', 'tag', 'ext'])
+            chat.update_updated(fields=updated_fields)
         else:
             chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner, start_msg_id=start_msg_id, msg_id=start_msg_id)
             set_update_chat(chat, app_id, title, tag, ext)
@@ -124,15 +135,28 @@ class ChatSerializer(serializers.ModelSerializer):
         return chat
 
 
-def set_update_chat(chat, app_id=None, title=None, tag=None, ext=None):
-    if app_id is not None:
+def set_update_chat(chat, biz_id=None, app_id=None, title=None, tag=None, ext=None, is_deleted=None):
+    updated = []
+    if biz_id is not None and biz_id != chat.biz_id:
+        updated.append(['biz_id'])
+        chat.biz_id = biz_id
+    if app_id is not None and app_id != chat.app_id:
+        updated.append('app_id')
         chat.app_id = app_id
-    if title is not None:
+    if title is not None and title != chat.title:
+        updated.append('title')
         chat.title = title
-    if tag is not None:
+    if tag is not None and tag != chat.tag:
+        updated.append('tag')
         chat.tag = tag
-    if ext is not None:
+    if ext is not None and ext != chat.ext:
+        updated.append('ext')
         chat.ext = ext
+    if is_deleted is not None and is_deleted != chat.is_deleted:
+        updated.append('is_deleted')
+        chat.is_deleted = is_deleted
+
+    return updated
 
 
 class MembersSerializer(serializers.Serializer):
