@@ -29,7 +29,8 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('id', 'biz_id', 'app_id', 'type', 'users', 'title', 'tag', 'start_msg_id', 'ext', 'is_deleted', 'created')
+        fields = (
+        'id', 'biz_id', 'app_id', 'type', 'users', 'title', 'tag', 'start_msg_id', 'ext', 'is_deleted', 'created')
 
     def validate_type(self, value):
         if value not in ChatTypes:
@@ -125,7 +126,8 @@ class ChatSerializer(serializers.ModelSerializer):
         if chat is not None:
             updated_fields = set_update_chat(chat, biz_id, app_id, title, tag, ext, is_deleted=False)
             # update
-            chat.update_updated(fields=updated_fields)
+            if updated_fields:
+                chat.update_updated(fields=updated_fields)
         else:
             chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner, start_msg_id=start_msg_id, msg_id=start_msg_id)
             set_update_chat(chat, app_id, title, tag, ext)
@@ -138,7 +140,7 @@ class ChatSerializer(serializers.ModelSerializer):
 def set_update_chat(chat, biz_id=None, app_id=None, title=None, tag=None, ext=None, is_deleted=None):
     updated = []
     if biz_id is not None and biz_id != chat.biz_id:
-        updated.append(['biz_id'])
+        updated.append('biz_id')
         chat.biz_id = biz_id
     if app_id is not None and app_id != chat.app_id:
         updated.append('app_id')
@@ -256,8 +258,9 @@ def chat_insert_msgs(chat, msgs):
         for msg in msgs:
             if chat.start_msg_id <= 0:
                 break
-            cursor.execute('INSERT INTO xchat_message(chat_id, chat_type, id, uid, ts, msg, domain) VALUES(%s, %s, %s, %s, %s, %s, %s)',
-                           [chat.id, chat.type, chat.start_msg_id, msg['uid'], msg['ts'], msg['msg'], msg['domain']])
+            cursor.execute(
+                'INSERT INTO xchat_message(chat_id, chat_type, id, uid, ts, msg, domain) VALUES(%S, %S, %S, %S, %S, %S, %S)',
+                [chat.id, chat.type, chat.start_msg_id, msg['uid'], msg['ts'], msg['msg'], msg['domain']])
             chat.start_msg_id -= 1
             n += 1
     chat.update_updated(fields=['start_msg_id'])
