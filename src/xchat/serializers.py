@@ -130,7 +130,7 @@ class ChatSerializer(serializers.ModelSerializer):
                 chat.update_updated(fields=updated_fields)
         else:
             chat = Chat(type=t, key=key, biz_id=biz_id, owner=owner, start_msg_id=start_msg_id, msg_id=start_msg_id)
-            set_update_chat(chat, app_id, title, tag, ext)
+            set_update_chat(chat, biz_id, app_id, title, tag, ext)
             chat.save()
 
         update_chat_members(chat, users)
