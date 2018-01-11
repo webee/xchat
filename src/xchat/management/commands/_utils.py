@@ -3,7 +3,7 @@ from django.conf import settings
 import jwt
 
 
-def gen_token(user=None, ns=None, expire=timedelta(hours=1), is_admin=False):
+def gen_token(name=None, ns=None, expire=timedelta(hours=1), is_admin=False):
     payload = {
         'exp': datetime.utcnow() + expire
     }
@@ -14,7 +14,7 @@ def gen_token(user=None, ns=None, expire=timedelta(hours=1), is_admin=False):
     else:
         payload.update({
             'ns': ns,
-            'user': user
+            'name': name
         })
 
     return jwt.encode(payload, settings.NS_USER_KEYS[ns], 'HS256').decode('utf-8')
