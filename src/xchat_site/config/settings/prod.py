@@ -3,7 +3,7 @@ from pytoolbox.util.pmc_config import get_project_root, load_yaml, read_string
 
 proj_root = get_project_root()
 DEBUG = False
-ALLOWED_HOSTS = ['xchat.qinqinxiaobao.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['l.xchat.com', 'xchat.qinqinxiaobao.com', '127.0.0.1', 'localhost']
 
 XCHAT_API_ROOT_URL = 'http://xchat.qinqinxiaobao.com'
 # SECURITY WARNING: keep the secret key used in production secret!
