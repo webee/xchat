@@ -222,7 +222,7 @@ def update_chat_members(chat, new_users):
 
 class MessageSerializer(serializers.ModelSerializer):
     ts = serializers.FloatField()
-    domain = serializers.CharField(required=False, max_length=16, default='')
+    domain = serializers.CharField(required=False, max_length=16, allow_blank=True, default='')
 
     class Meta:
         model = Message
