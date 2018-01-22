@@ -1,4 +1,5 @@
 import arrow
+from contextlib import closing
 from django.db import transaction, connection
 from rest_framework import serializers
 from pytoolbox.jwt import encode_ns_user
@@ -30,7 +31,7 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = (
-        'id', 'biz_id', 'app_id', 'type', 'users', 'title', 'tag', 'start_msg_id', 'ext', 'is_deleted', 'created')
+            'id', 'biz_id', 'app_id', 'type', 'users', 'title', 'tag', 'start_msg_id', 'ext', 'is_deleted', 'created')
 
     def validate_type(self, value):
         if value not in ChatTypes:
@@ -253,16 +254,21 @@ class MessagesSerializer(serializers.Serializer):
 @transaction.atomic
 def chat_insert_msgs(chat, msgs):
     chat = Chat.objects.select_for_update().get(pk=chat.id)
+    params = []
     n = 0
-    with connection.cursor() as cursor:
-        for msg in msgs:
-            if chat.start_msg_id <= 0:
-                break
-            cursor.execute(
-                'INSERT INTO xchat_message(chat_id, chat_type, id, uid, ts, msg, domain) VALUES(%S, %S, %S, %S, %S, %S, %S)',
-                [chat.id, chat.type, chat.start_msg_id, msg['uid'], msg['ts'], msg['msg'], msg['domain']])
-            chat.start_msg_id -= 1
-            n += 1
+    for msg in msgs:
+        if chat.start_msg_id <= 0:
+            break
+        params.extend([chat.id, chat.type, chat.start_msg_id, msg['uid'], msg['ts'], msg['msg'], msg['domain']])
+        chat.start_msg_id -= 1
+        n += 1
+
+    if n <= 0:
+        return n
+
+    sql = "INSERT INTO xchat_message(chat_id, chat_type, id, uid, ts, msg, domain) VALUES {}".format(','.join(['(%s, %s, %s, %s, %s, %s, %s)'] * n))
+    with closing(connection.cursor()) as cursor:
+        cursor.execute(sql, params)
     chat.update_updated(fields=['start_msg_id'])
 
-    return n
+    return len(msgs)
