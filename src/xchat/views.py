@@ -179,11 +179,12 @@ class ChatMessagesView(APIView):
 
     def post(self, request, chat_id):
         """向前插入消息"""
+        data = request.data
         chat = self.get_chat(chat_id)
         if chat.start_msg_id <= 0:
             return Response({'ok': False})
 
-        serializer = MessagesSerializer(data=request.data)
+        serializer = MessagesSerializer(data=data)
         if serializer.is_valid():
             n = serializer.save(ns=request.user.ns, chat=chat)
             return Response({
