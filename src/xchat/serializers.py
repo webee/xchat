@@ -231,6 +231,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class MessagesSerializer(serializers.Serializer):
+    start_msg_id = serializers.IntegerField(required=False, min_value=1, default=1)
     msgs = serializers.ListField(required=False, child=MessageSerializer(), default=[])
 
     def update(self, instance, validated_data):
@@ -239,6 +240,7 @@ class MessagesSerializer(serializers.Serializer):
     def create(self, validated_data):
         ns = validated_data['ns']
         chat = validated_data['chat']
+        start_msg_id = validated_data['start_msg_id']
 
         msgs = [dict(uid=encode_ns_user(ns, msg.get('uid')),
                      ts=arrow.get(msg.get('ts')).datetime,
@@ -248,12 +250,16 @@ class MessagesSerializer(serializers.Serializer):
         if len(msgs) <= 0:
             return 0
 
-        return chat_insert_msgs(chat, msgs)
+        return chat_insert_msgs(chat, msgs, start_msg_id=start_msg_id)
 
 
 @transaction.atomic
-def chat_insert_msgs(chat, msgs):
+def chat_insert_msgs(chat, msgs, start_msg_id=1):
     chat = Chat.objects.select_for_update().get(pk=chat.id)
+    if chat.start_msg_id < start_msg_id:
+        # 超过提示的start_msg_id
+        return 0
+
     params = []
     n = 0
     for msg in msgs:
