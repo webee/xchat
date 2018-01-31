@@ -232,6 +232,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class MessagesSerializer(serializers.Serializer):
     start_msg_id = serializers.IntegerField(required=False, min_value=1, default=1)
+    start_delta = serializers.IntegerField(required=False, min_value=0, default=0)
     msgs = serializers.ListField(required=False, child=MessageSerializer(), default=[])
 
     def update(self, instance, validated_data):
@@ -241,6 +242,7 @@ class MessagesSerializer(serializers.Serializer):
         ns = validated_data['ns']
         chat = validated_data['chat']
         start_msg_id = validated_data['start_msg_id']
+        start_delta = validated_data['start_delta']
 
         msgs = [dict(uid=encode_ns_user(ns, msg.get('uid')),
                      ts=arrow.get(msg.get('ts')).datetime,
@@ -250,23 +252,24 @@ class MessagesSerializer(serializers.Serializer):
         if len(msgs) <= 0:
             return 0
 
-        return chat_insert_msgs(chat, msgs, start_msg_id=start_msg_id)
+        return chat_insert_msgs(chat, msgs, start_msg_id=start_msg_id, start_delta=start_delta)
 
 
 @transaction.atomic
-def chat_insert_msgs(chat, msgs, start_msg_id=1):
+def chat_insert_msgs(chat, msgs, start_msg_id=1, start_delta=0):
     chat = Chat.objects.select_for_update().get(pk=chat.id)
-    if chat.start_msg_id < start_msg_id:
+    chat_start_msg_id = chat.start_msg_id - start_delta
+    if chat_start_msg_id < start_msg_id:
         # 超过提示的start_msg_id
         return 0
 
     params = []
     n = 0
     for msg in msgs:
-        if chat.start_msg_id <= 0:
+        if chat_start_msg_id <= 0:
             break
-        params.extend([chat.id, chat.type, chat.start_msg_id, msg['uid'], msg['ts'], msg['msg'], msg['domain']])
-        chat.start_msg_id -= 1
+        params.extend([chat.id, chat.type, chat_start_msg_id, msg['uid'], msg['ts'], msg['msg'], msg['domain']])
+        chat_start_msg_id -= 1
         n += 1
 
     if n <= 0:
@@ -275,6 +278,9 @@ def chat_insert_msgs(chat, msgs, start_msg_id=1):
     sql = "INSERT INTO xchat_message(chat_id, chat_type, id, uid, ts, msg, domain) VALUES {}".format(','.join(['(%s, %s, %s, %s, %s, %s, %s)'] * n))
     with closing(connection.cursor()) as cursor:
         cursor.execute(sql, params)
-    chat.update_updated(fields=['start_msg_id'])
+
+    if start_delta == 0:
+        chat.start_msg_id = chat_start_msg_id
+        chat.update_updated(fields=['start_msg_id'])
 
     return len(msgs)
